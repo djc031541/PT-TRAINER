@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="PT 코치 맥스">
+<meta name="theme-color" content="#2c1810">
+<title>💪 PT 코치 맥스</title>
+<style>
+/* ===== RESET & BASE ===== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+html {
+  height: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+body {
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+  overflow: hidden;
+  background: #bacee0;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* ===== CSS VARIABLES ===== */
+:root {
+  --safe-top: env(safe-area-inset-top, 20px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --kakao-bg: #bacee0;
+  --header-bg: #2c1810;
+  --header-h: 60px;
+  --user-bubble: #fee500;
+  --ai-bubble: #ffffff;
+  --primary: #ff6b35;
+  --primary-light: #ff8c5a;
+  --accent: #4caf50;
+  --dark: #1a1a1a;
+  --gray: #888;
+  --light-gray: #f5f5f5;
+}
+
+/* ===== SCREEN WRAPPER ===== */
+.screen {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+}
+
+/* ============================================================
+   ONBOARDING SCREEN
+============================================================ */
+#screen-onboarding {
+  background: linear-gradient(170deg, #1a1a2e 0%, #16213e 55%, #0f3460 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: calc(var(--safe-top) + 36px) 20px calc(var(--safe-bottom) + 40px);
+}
+
+.ob-hero {
+  text-align: center;
+  margin-bottom: 32px;
+}
+.ob-icon {
+  font-size: 72px;
+  display: block;
+  margin-bottom: 12px;
+  filter: drop-shadow(0 0 24px rgba(255,107,53,0.6));
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%,100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+.ob-title {
+  color: #fff;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin-bottom: 6px;
+}
+.ob-sub {
+  color: rgba(255,255,255,0.5);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.ob-card {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.13);
+  border-radius: 22px;
+  padding: 26px 20px;
+  width: 100%;
+  max-width: 420px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  margin-bottom: 16px;
+}
+
+.ob-section {
+  color: rgba(255,255,255,0.45);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  margin-top: 22px;
+}
+.ob-section:first-child { margin-top: 0; }
+
+.ob-group {
+  margin-bottom: 14px;
+}
+.ob-label {
+  color: rgba(255,255,255,0.65);
+  font-size: 13px;
+  margin-bottom: 6px;
+  display: block;
+}
+.ob-input {
+  width: 100%;
+  background: rgba(255,255,255,0.09);
+  border: 1.5px solid rgba(255,255,255,0.18);
+  border-radius: 13px;
+  color: #fff;
+  font-size: 16px;
+  font-family: inherit;
+  padding: 13px 15px;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: border-color 0.2s, background 0.2s;
+  caret-color: var(--primary);
+}
+.ob-input:focus {
+  border-color: var(--primary);
+  background: rgba(255,255,255,0.13);
+}
+.ob-input::placeholder { color: rgba(255,255,255,0.28); }
+.ob-input[type=number]::-webkit-outer-spin-button,
+.ob-input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+.ob-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.ob-gender-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.ob-gender-btn {
+  background: rgba(255,255,255,0.09);
+  border: 1.5px solid rgba(255,255,255,0.18);
+  border-radius: 13px;
+  color: rgba(255,255,255,0.65);
+  font-size: 15px;
+  font-family: inherit;
+  padding: 13px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  -webkit-appearance: none;
+}
+.ob-gender-btn.sel {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+  font-weight: 700;
+}
+.ob-gender-btn:active { opacity: 0.8; }
+
+.bmi-box {
+  background: rgba(255,107,53,0.12);
+  border: 1px solid rgba(255,107,53,0.3);
+  border-radius: 13px;
+  padding: 14px;
+  text-align: center;
+  margin-top: 10px;
+  display: none;
+  transition: all 0.3s;
+}
+.bmi-val { color: var(--primary); font-size: 38px; font-weight: 800; }
+.bmi-stat { color: rgba(255,255,255,0.6); font-size: 12px; margin-top: 2px; }
+
+.ob-goal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.ob-goal-btn {
+  background: rgba(255,255,255,0.07);
+  border: 1.5px solid rgba(255,255,255,0.15);
+  border-radius: 13px;
+  padding: 16px 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  -webkit-appearance: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.ob-goal-btn .goal-icon { font-size: 26px; }
+.ob-goal-btn .goal-text { color: rgba(255,255,255,0.65); font-size: 13px; font-family: inherit; }
+.ob-goal-btn.sel {
+  background: rgba(255,107,53,0.2);
+  border-color: var(--primary);
+}
+.ob-goal-btn.sel .goal-text { color: #fff; font-weight: 700; }
+.ob-goal-btn:active { opacity: 0.8; }
+
+.ob-start-btn {
+  width: 100%;
+  max-width: 420px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  border: none;
+  border-radius: 17px;
+  color: #fff;
+  font-size: 17px;
+  font-weight: 800;
+  font-family: inherit;
+  padding: 18px;
+  margin-top: 8px;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(255,107,53,0.45);
+  transition: transform 0.15s, opacity 0.15s;
+  -webkit-appearance: none;
+  letter-spacing: 0.3px;
+}
+.ob-start-btn:active { transform: scale(0.97); opacity: 0.88; }
+
+/* ============================================================
+   CHAT SCREEN
+============================================================ */
+#screen-chat {
+  display: none;
+  flex-direction: column;
+  background: var(--kakao-bg);
+}
+#screen-chat.visible { display: flex; }
+
+/* --- Header --- */
+.chat-header {
+  background: var(--header-bg);
+  padding-top: calc(var(--safe-top) + 10px);
+  padding-bottom: 12px;
+  padding-left: calc(var(--safe-left) + 14px);
+  padding-right: calc(var(--safe-right) + 14px);
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  flex-shrink: 0;
+  z-index: 10;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+}
+.hd-avatar {
+  width: 42px; height: 42px;
+  background: linear-gradient(135deg, var(--primary), #e55a2b);
+  border-radius: 13px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(255,107,53,0.4);
+}
+.hd-info { flex: 1; min-width: 0; }
+.hd-name { color: #fff; font-size: 16px; font-weight: 700; }
+.hd-status { color: rgba(255,255,255,0.5); font-size: 11px; margin-top: 1px; }
+.hd-btn {
+  width: 36px; height: 36px;
+  background: rgba(255,255,255,0.1);
+  border: none; border-radius: 10px;
+  color: #fff; font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+.hd-btn:active { background: rgba(255,255,255,0.2); }
+
+/* --- Messages --- */
+.chat-msgs {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 14px 14px 6px;
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
+}
+.chat-msgs::-webkit-scrollbar { display: none; }
+
+.date-sep {
+  text-align: center;
+  margin: 10px 0 16px;
+}
+.date-sep span {
+  background: rgba(0,0,0,0.13);
+  color: rgba(0,0,0,0.5);
+  font-size: 11px;
+  padding: 4px 12px;
+  border-radius: 10px;
+  font-weight: 500;
+}
+
+/* Message row */
+.msg-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  margin-bottom: 3px;
+}
+.msg-row + .msg-row.ai { margin-top: 2px; }
+.msg-row.user { flex-direction: row-reverse; }
+
+.msg-av {
+  width: 34px; height: 34px;
+  background: linear-gradient(135deg, var(--primary), #e55a2b);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+  align-self: flex-end;
+}
+.msg-row.user .msg-av { display: none; }
+
+.msg-body { max-width: 76%; display: flex; flex-direction: column; gap: 2px; }
+.msg-row.user .msg-body { align-items: flex-end; }
+
+.msg-name {
+  color: rgba(0,0,0,0.45);
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 2px;
+  padding-left: 2px;
+}
+.msg-row.user .msg-name { display: none; }
+
+.bubble {
+  background: var(--ai-bubble);
+  border-radius: 4px 18px 18px 18px;
+  padding: 10px 13px;
+  font-size: 14.5px;
+  color: var(--dark);
+  line-height: 1.55;
+  word-break: break-word;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.09);
+  max-width: 100%;
+  -webkit-user-select: text;
+  user-select: text;
+}
+.msg-row.user .bubble {
+  background: var(--user-bubble);
+  border-radius: 18px 4px 18px 18px;
+  color: #1a1a1a;
+}
+.bubble img {
+  max-width: 100%;
+  border-radius: 10px;
+  display: block;
+  margin-top: 4px;
+}
+.bubble img:first-child { margin-top: 0; }
+
+/* Formatted content inside bubbles */
+.bubble b, .bubble strong { font-weight: 700; }
+.bubble .section-hd {
+  font-weight: 700;
+  color: var(--primary);
+  margin: 8px 0 4px;
+  font-size: 13.5px;
+}
+.bubble .section-hd:first-child { margin-top: 0; }
+.bubble hr-light {
+  display: block;
+  border: none;
+  border-top: 1px solid rgba(0,0,0,0.08);
+  margin: 8px 0;
+}
+
+.msg-meta {
+  color: rgba(0,0,0,0.38);
+  font-size: 10px;
+  padding: 0 3px;
+  white-space: nowrap;
+  align-self: flex-end;
+}
+
+/* Typing indicator */
+.typing-row {
+  display: none;
+  align-items: flex-end;
+  gap: 6px;
+  margin-bottom: 6px;
+  padding: 0 14px;
+}
+.typing-row.show { display: flex; }
+.typing-bubble {
+  background: var(--ai-bubble);
+  border-radius: 4px 18px 18px 18px;
+  padding: 12px 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.09);
+}
+.typing-dots {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+.dot {
+  width: 8px; height: 8px;
+  background: #bbb;
+  border-radius: 50%;
+  animation: dotBounce 1.3s ease-in-out infinite;
+}
+.dot:nth-child(2) { animation-delay: 0.18s; }
+.dot:nth-child(3) { animation-delay: 0.36s; }
+@keyframes dotBounce {
+  0%,60%,100% { transform: translateY(0); opacity: 0.6; }
+  30% { transform: translateY(-7px); opacity: 1; }
+}
+
+/* --- Quick Actions --- */
+.quick-bar {
+  display: flex;
+  gap: 8px;
+  padding: 7px 14px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  flex-shrink: 0;
+  scrollbar-width: none;
+  background: rgba(186,206,224,0.3);
+}
+.quick-bar::-webkit-scrollbar { display: none; }
+.q-chip {
+  background: rgba(255,255,255,0.9);
+  border: none;
+  border-radius: 20px;
+  padding: 7px 13px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #333;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  display: flex; align-items: center; gap: 4px;
+  flex-shrink: 0;
+  transition: background 0.15s, transform 0.1s;
+  -webkit-appearance: none;
+}
+.q-chip:active { background: #e8e8e8; transform: scale(0.96); }
+
+/* --- Image Preview --- */
+.img-preview-wrap {
+  display: none;
+  padding: 8px 14px 0;
+  background: #e8e8e8;
+  flex-shrink: 0;
+}
+.img-preview-wrap.show { display: block; }
+.img-preview-inner { position: relative; display: inline-block; }
+.img-thumb {
+  width: 76px; height: 76px;
+  border-radius: 11px;
+  object-fit: cover;
+  border: 2.5px solid var(--primary);
+  display: block;
+}
+.img-remove {
+  position: absolute;
+  top: -7px; right: -7px;
+  width: 22px; height: 22px;
+  background: #ff3b30;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+.img-remove:active { opacity: 0.8; }
+
+/* --- Input Area --- */
+.input-area {
+  background: #e8e8e8;
+  padding: 8px 10px;
+  padding-bottom: calc(var(--safe-bottom) + 8px);
+  padding-left: calc(var(--safe-left) + 10px);
+  padding-right: calc(var(--safe-right) + 10px);
+  display: flex;
+  align-items: flex-end;
+  gap: 7px;
+  flex-shrink: 0;
+  border-top: 1px solid rgba(0,0,0,0.1);
+}
+.ia-btn {
+  width: 40px; height: 40px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  border-radius: 50%;
+  transition: background 0.15s;
+  -webkit-appearance: none;
+}
+.ia-btn:active { background: rgba(0,0,0,0.08); }
+.ia-wrap {
+  flex: 1;
+  background: #fff;
+  border-radius: 21px;
+  padding: 10px 14px;
+  min-height: 40px;
+  max-height: 120px;
+  display: flex;
+  align-items: flex-end;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+.ia-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  font-family: inherit;
+  resize: none;
+  background: transparent;
+  color: var(--dark);
+  max-height: 100px;
+  overflow-y: auto;
+  line-height: 1.4;
+  -webkit-appearance: none;
+  -webkit-user-select: text;
+  user-select: text;
+}
+.ia-input::placeholder { color: #aaa; }
+.ia-send {
+  width: 40px; height: 40px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  border: none;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 17px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 3px 10px rgba(255,107,53,0.45);
+  transition: transform 0.1s, opacity 0.1s;
+  -webkit-appearance: none;
+}
+.ia-send:active { transform: scale(0.9); opacity: 0.85; }
+
+/* ============================================================
+   PROFILE MODAL (bottom sheet)
+============================================================ */
+.modal-bg {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: none;
+  align-items: flex-end;
+  z-index: 200;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+.modal-bg.open { display: flex; }
+.modal-sheet {
+  background: #fff;
+  border-radius: 22px 22px 0 0;
+  padding: 16px 20px calc(var(--safe-bottom) + 24px);
+  width: 100%;
+  max-height: 82vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  animation: slideUp 0.3s cubic-bezier(.32,.72,0,1);
+}
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+.modal-handle {
+  width: 38px; height: 4px;
+  background: #ddd;
+  border-radius: 2px;
+  margin: 0 auto 18px;
+}
+.modal-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--dark);
+  margin-bottom: 18px;
+}
+.profile-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.profile-tile {
+  background: var(--light-gray);
+  border-radius: 14px;
+  padding: 14px 12px;
+  text-align: center;
+}
+.profile-tile .t-icon { font-size: 24px; margin-bottom: 4px; }
+.profile-tile .t-label { color: var(--gray); font-size: 11px; margin-bottom: 2px; }
+.profile-tile .t-val { font-size: 14px; font-weight: 700; color: var(--dark); }
+.modal-reset-btn {
+  width: 100%;
+  background: #ff3b30;
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  padding: 15px;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  margin-top: 6px;
+  -webkit-appearance: none;
+  transition: opacity 0.15s;
+}
+.modal-reset-btn:active { opacity: 0.8; }
+
+/* ============================================================
+   UTILS
+============================================================ */
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- ===========================
+     ONBOARDING
+=========================== -->
+<div id="screen-onboarding" class="screen">
+  <div class="ob-hero">
+    <span class="ob-icon">💪</span>
+    <h1 class="ob-title">내 맞춤 PT 코치</h1>
+    <p class="ob-sub">AI 트레이너가 운동·식단을 함께 관리해드려요</p>
+  </div>
+
+  <div class="ob-card">
+    <div class="ob-section">기본 정보</div>
+
+    <div class="ob-group">
+      <label class="ob-label">이름 (닉네임)</label>
+      <input type="text" class="ob-input" id="inp-name" placeholder="홍길동" autocomplete="off" autocorrect="off">
+    </div>
+
+    <div class="ob-row">
+      <div class="ob-group">
+        <label class="ob-label">나이</label>
+        <input type="number" class="ob-input" id="inp-age" placeholder="25" inputmode="numeric">
+      </div>
+      <div class="ob-group">
+        <label class="ob-label">성별</label>
+        <div class="ob-gender-row">
+          <button class="ob-gender-btn sel" id="btn-m" onclick="setGender('male')">남성 ♂</button>
+          <button class="ob-gender-btn" id="btn-f" onclick="setGender('female')">여성 ♀</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="ob-section">신체 정보</div>
+
+    <div class="ob-row">
+      <div class="ob-group">
+        <label class="ob-label">키 (cm)</label>
+        <input type="number" class="ob-input" id="inp-ht" placeholder="175" inputmode="decimal" oninput="calcBMI()">
+      </div>
+      <div class="ob-group">
+        <label class="ob-label">몸무게 (kg)</label>
+        <input type="number" class="ob-input" id="inp-wt" placeholder="70" inputmode="decimal" oninput="calcBMI()">
+      </div>
+    </div>
+
+    <div class="bmi-box" id="bmi-box">
+      <div class="bmi-val" id="bmi-val">--</div>
+      <div class="bmi-stat" id="bmi-stat">BMI</div>
+    </div>
+
+    <div class="ob-section">운동 목표</div>
+
+    <div class="ob-goal-grid" id="goal-grid">
+      <button class="ob-goal-btn sel" onclick="setGoal(this,'다이어트')">
+        <span class="goal-icon">🔥</span><span class="goal-text">다이어트</span>
+      </button>
+      <button class="ob-goal-btn" onclick="setGoal(this,'근력 강화')">
+        <span class="goal-icon">💪</span><span class="goal-text">근력 강화</span>
+      </button>
+      <button class="ob-goal-btn" onclick="setGoal(this,'체력 향상')">
+        <span class="goal-icon">⚡</span><span class="goal-text">체력 향상</span>
+      </button>
+      <button class="ob-goal-btn" onclick="setGoal(this,'전신 건강')">
+        <span class="goal-icon">🌟</span><span class="goal-text">전신 건강</span>
+      </button>
+    </div>
+  </div>
+
+  <button class="ob-start-btn" onclick="startApp()">💪 PT 시작하기</button>
+</div>
+
+<!-- ===========================
+     CHAT SCREEN
+=========================== -->
+<div id="screen-chat" class="screen">
+
+  <!-- Header -->
+  <div class="chat-header">
+    <div class="hd-avatar">🏋️</div>
+    <div class="hd-info">
+      <div class="hd-name">PT 코치 맥스</div>
+      <div class="hd-status" id="hd-status">온라인 · 항상 응답 가능</div>
+    </div>
+    <button class="hd-btn" onclick="openProfile()" title="내 프로필">👤</button>
+  </div>
+
+  <!-- Messages -->
+  <div class="chat-msgs" id="chat-msgs">
+    <div class="date-sep"><span id="today-label"></span></div>
+  </div>
+
+  <!-- Typing -->
+  <div class="typing-row" id="typing-row">
+    <div class="msg-av">🏋️</div>
+    <div class="typing-bubble">
+      <div class="typing-dots">
+        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick chips -->
+  <div class="quick-bar">
+    <button class="q-chip" onclick="quickSend('📊 오늘 운동 기록을 분석해줘!')">📊 운동 분석</button>
+    <button class="q-chip" onclick="quickSend('🥗 오늘 먹은 식단 분석해줘!')">🥗 식단 분석</button>
+    <button class="q-chip" onclick="quickSend('💪 오늘 운동 루틴 추천해줘!')">💪 운동 추천</button>
+    <button class="q-chip" onclick="quickSend('🔥 운동 하기 싫은데 동기부여 해줘!')">🔥 동기부여</button>
+    <button class="q-chip" onclick="quickSend('📈 내 목표에 맞는 식단 계획 알려줘!')">📈 식단 계획</button>
+    <button class="q-chip" onclick="quickSend('😴 오늘 운동 얼마나 해야 해?')">⏱️ 운동량 확인</button>
+  </div>
+
+  <!-- Image preview -->
+  <div class="img-preview-wrap" id="img-preview-wrap">
+    <div class="img-preview-inner">
+      <img id="img-thumb" class="img-thumb" src="" alt="첨부 이미지">
+      <div class="img-remove" onclick="clearImage()">✕</div>
+    </div>
+  </div>
+
+  <!-- Input -->
+  <div class="input-area">
+    <button class="ia-btn" onclick="triggerFilePick()" title="사진 첨부">📷</button>
+    <div class="ia-wrap">
+      <textarea class="ia-input" id="ia-input" placeholder="메시지를 입력하세요..." rows="1"
+        oninput="autoGrow(this)" onkeydown="onKey(event)"></textarea>
+    </div>
+    <button class="ia-send" onclick="sendMsg()" title="전송">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+      </svg>
+    </button>
+  </div>
+
+  <input type="file" id="file-input" accept="image/*" style="display:none" onchange="onFileChange(event)">
+</div>
+
+<!-- ===========================
+     PROFILE MODAL
+=========================== -->
+<div class="modal-bg" id="profile-modal" onclick="onModalBgClick(event)">
+  <div class="modal-sheet" id="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">내 프로필 📋</div>
+    <div class="profile-grid" id="profile-grid"></div>
+    <div style="background:#fff8f0;border:1px solid #ffe0cc;border-radius:14px;padding:14px;margin-bottom:12px">
+      <div style="font-size:12px;color:#ff6b35;font-weight:700;margin-bottom:6px">보유 운동기구</div>
+      <div style="font-size:13px;color:#555;line-height:1.7">
+        💪 맨몸운동 · 🏋️ 아령/덤벨(긴것·짧은것)<br>
+        🔗 벽 로잉 · 🪢 배틀 로프 · 🧊 ABP 슬라이더<br>
+        🪜 스텝퍼 · 🌀 트위스터 · 🚲 실내자전거(즈위프트)<br>
+        🌿 야외 산책 · ⛰️ 가벼운 등산
+      </div>
+    </div>
+    <button class="modal-reset-btn" onclick="resetApp()">🔄 프로필 초기화 (대화 삭제)</button>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   CONFIG
+============================================================ */
+const API_KEY  = 'AIzaSyBOBtbOfwZ1-deLsFa2Kn7YhaXIKPLM8LY';
+const MODEL    = 'gemini-2.0-flash';
+const API_URL  = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}`;
+
+/* ============================================================
+   STATE
+============================================================ */
+let profile   = null;
+let gender    = 'male';
+let goal      = '다이어트';
+let history   = [];          // [{role, parts:[{text}]}]  – API context (no images)
+let pendingImg = null;       // { data: base64, mime: string }
+
+/* ============================================================
+   ONBOARDING
+============================================================ */
+function setGender(g) {
+  gender = g;
+  document.getElementById('btn-m').classList.toggle('sel', g === 'male');
+  document.getElementById('btn-f').classList.toggle('sel', g === 'female');
+}
+
+function setGoal(btn, g) {
+  goal = g;
+  document.querySelectorAll('.ob-goal-btn').forEach(b => b.classList.remove('sel'));
+  btn.classList.add('sel');
+}
+
+function calcBMI() {
+  const h = parseFloat(document.getElementById('inp-ht').value);
+  const w = parseFloat(document.getElementById('inp-wt').value);
+  const box = document.getElementById('bmi-box');
+  if (h > 0 && w > 0) {
+    const bmi = (w / ((h / 100) ** 2)).toFixed(1);
+    document.getElementById('bmi-val').textContent = bmi;
+    document.getElementById('bmi-stat').textContent = 'BMI · ' + bmiLabel(bmi);
+    box.style.display = 'block';
+  } else {
+    box.style.display = 'none';
+  }
+}
+
+function bmiLabel(bmi) {
+  bmi = parseFloat(bmi);
+  if (bmi < 18.5) return '저체중 ⚠️';
+  if (bmi < 23)   return '정상 ✅';
+  if (bmi < 25)   return '과체중 🔶';
+  if (bmi < 30)   return '비만 🔴';
+  return '고도비만 🔴';
+}
+
+function startApp() {
+  const name = document.getElementById('inp-name').value.trim() || '회원님';
+  const age  = parseInt(document.getElementById('inp-age').value) || 25;
+  const ht   = parseFloat(document.getElementById('inp-ht').value);
+  const wt   = parseFloat(document.getElementById('inp-wt').value);
+
+  if (!ht || !wt) { alert('키와 몸무게를 입력해주세요! 📏'); return; }
+
+  const bmi = (wt / ((ht / 100) ** 2)).toFixed(1);
+  profile = { name, age, gender, height: ht, weight: wt, bmi, goal };
+  localStorage.setItem('pt_profile', JSON.stringify(profile));
+
+  showChat();
+}
+
+/* ============================================================
+   CHAT INIT
+============================================================ */
+function showChat() {
+  document.getElementById('screen-onboarding').style.display = 'none';
+  const sc = document.getElementById('screen-chat');
+  sc.classList.add('visible');
+
+  // Date label
+  const d = new Date();
+  document.getElementById('today-label').textContent =
+    d.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'long' });
+
+  // Restore history
+  const saved = localStorage.getItem('pt_history');
+  if (saved) {
+    try { history = JSON.parse(saved); } catch(e) { history = []; }
+  }
+
+  // Welcome
+  setTimeout(() => {
+    const bmi = profile.bmi;
+    const welcome = `안녕, ${profile.name}! 😄 나는 PT 코치 맥스야!\n\n` +
+      `📋 **오늘의 내 프로필**\n• 키 ${profile.height}cm · 몸무게 ${profile.weight}kg\n` +
+      `• BMI ${bmi} (${bmiLabel(bmi)})\n• 목표: ${profile.goal}\n\n` +
+      `${bmiMotivation(bmi, profile.goal)}\n\n` +
+      `📸 **이렇게 사용해봐!**\n` +
+      `• 애플워치 운동 화면 → 운동 분석 + 추천 세트\n` +
+      `• 음식 사진 / 바코드 → 칼로리 & 영양 분석\n• 궁금한 거 뭐든지 물어봐! 💪`;
+    addAI(welcome);
+  }, 400);
+}
+
+function bmiMotivation(bmi, goal) {
+  bmi = parseFloat(bmi);
+  if (bmi < 18.5) return `현재 체중이 조금 가벼운 편이야. ${goal} 목표와 함께 충분한 영양 섭취도 챙겨보자! 🥗`;
+  if (bmi < 23)   return `체중 관리가 정말 훌륭해! ${goal} 목표 향해 같이 달리자! 🏃`;
+  if (bmi < 25)   return `조금만 더 하면 이상적인 체중에 도달할 수 있어! ${goal}, 함께 하면 반드시 돼! 💪`;
+  return `${goal} 목표 완전 딱이야! 꾸준히만 하면 반드시 바뀌어. 같이 해보자! 🔥`;
+}
+
+/* ============================================================
+   SYSTEM PROMPT
+============================================================ */
+function sysPrompt() {
+  return `당신은 ${profile.name}님의 개인 PT 트레이너 "코치 맥스"입니다.
+항상 친근하고 열정적인 반말로 대화하고, 이모지를 적절히 사용해서 친근감을 더하세요.
+
+👤 회원 프로필:
+• 이름: ${profile.name} / 나이: ${profile.age}세 / 성별: ${profile.gender === 'male' ? '남성' : '여성'}
+• 키: ${profile.height}cm / 몸무게: ${profile.weight}kg / BMI: ${profile.bmi} (${bmiLabel(profile.bmi)})
+• 목표: ${profile.goal}
+
+🏠 보유 운동기구:
+• 맨몸운동 (푸시업, 스쿼트, 런지, 버피, 마운틴클라이머 등)
+• 아령/덤벨 (긴 바벨형 + 짧은 덤벨형 모두 보유)
+• 벽 로잉 기구 (TRX 스타일 로우)
+• 배틀 로프
+• ABP 슬라이더 (코어/복근 운동)
+• 스텝퍼
+• 트위스터 (발판형 허리·복부 회전 운동기구)
+• 실내 자전거 (즈위프트 앱 연동, 고강도 인터벌 가능)
+• 야외: 산책, 가벼운 등산 가능
+
+📌 이미지 분석 지침:
+1. **애플워치 운동 기록 사진**:
+   - 운동 종류, 소요 시간, 소모 칼로리, 심박수, 운동링 달성 현황 분석
+   - 오늘 운동 강도 평가 (가벼움/적당/강함)
+   - 이어서 할 추천 운동 세트 3-4가지 제시 (보유기구 활용, 세트×횟수 명시)
+   - 쿨다운 스트레칭도 추천
+
+2. **음식 사진**:
+   - 음식 종류 파악 및 예상 칼로리 분석
+   - 단백질 / 탄수화물 / 지방 대략적 비율 분석
+   - ${profile.goal} 목표 기준 적합도 평가
+   - 개선 방향 또는 칭찬
+
+3. **바코드 사진**:
+   - 바코드 번호로 제품 파악 시도
+   - 해당 제품의 영양성분 분석 (1회 제공량 기준)
+   - ${profile.goal} 목표 관점의 조언
+
+💡 답변 스타일:
+- 반말로 친근하게 (예: "~해봐", "~야!", "정말 잘했어!")
+- 핵심 위주로 간결하게 (300-500자 적절)
+- 항상 격려와 동기부여로 마무리
+- 운동 추천 시 세트×횟수를 명확히 제시
+- 마크다운 **굵은글씨** 사용 가능`;
+}
+
+/* ============================================================
+   RENDER MESSAGES
+============================================================ */
+function addAI(text) {
+  const container = document.getElementById('chat-msgs');
+  const timeStr = nowTime();
+
+  const row = document.createElement('div');
+  row.className = 'msg-row ai';
+  row.innerHTML = `
+    <div class="msg-av">🏋️</div>
+    <div class="msg-body">
+      <div class="msg-name">코치 맥스</div>
+      <div class="bubble">${renderText(text)}</div>
+      <div class="msg-meta">${timeStr}</div>
+    </div>`;
+  container.appendChild(row);
+
+  history.push({ role: 'model', parts: [{ text }] });
+  saveHistory();
+  scrollBottom();
+}
+
+function addUser(text, imgSrc) {
+  const container = document.getElementById('chat-msgs');
+  const timeStr = nowTime();
+
+  let inner = '';
+  if (imgSrc) inner += `<img src="${imgSrc}" alt="첨부 사진" loading="lazy">`;
+  if (text)   inner += (imgSrc ? '<br>' : '') + esc(text);
+
+  const row = document.createElement('div');
+  row.className = 'msg-row user';
+  row.innerHTML = `
+    <div class="msg-body">
+      <div class="bubble">${inner}</div>
+      <div class="msg-meta">${timeStr}</div>
+    </div>`;
+  container.appendChild(row);
+  scrollBottom();
+}
+
+function renderText(t) {
+  return t
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g,'<em>$1</em>')
+    .replace(/^(#{1,3})\s+(.+)$/gm, (_, h, content) =>
+      `<div class="section-hd">${content}</div>`)
+    .replace(/\n/g,'<br>');
+}
+
+function esc(t) {
+  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+          .replace(/\n/g,'<br>');
+}
+
+function nowTime() {
+  const d = new Date();
+  let h = d.getHours(), m = d.getMinutes();
+  const ap = h >= 12 ? '오후' : '오전';
+  h = h % 12 || 12;
+  return `${ap} ${h}:${String(m).padStart(2,'0')}`;
+}
+
+function scrollBottom() {
+  const el = document.getElementById('chat-msgs');
+  setTimeout(() => el.scrollTop = el.scrollHeight, 60);
+}
+
+/* ============================================================
+   SEND MESSAGE
+============================================================ */
+async function sendMsg() {
+  const inputEl = document.getElementById('ia-input');
+  const text    = inputEl.value.trim();
+  const img     = pendingImg;
+
+  if (!text && !img) return;
+
+  // Show user message
+  const imgSrc = img ? `data:${img.mime};base64,${img.data}` : null;
+  addUser(text, imgSrc);
+
+  // Clear input state
+  inputEl.value = '';
+  autoGrow(inputEl);
+  clearImage();
+
+  // Build API parts for this turn
+  const parts = [];
+  if (img) parts.push({ inlineData: { mimeType: img.mime, data: img.data } });
+  if (text) parts.push({ text });
+  else parts.push({ text: '이 사진을 자세히 분석해줘.' });
+
+  // Add user turn to history (text only to keep storage lean)
+  const histText = text || (img ? '[사진 첨부]' : '');
+  history.push({ role: 'user', parts: [{ text: histText }] });
+
+  // Show typing
+  setTyping(true);
+  setStatus('답변 작성 중... ✍️');
+
+  // Build API contents: last 20 turns + current (with image)
+  const ctxHistory = history.slice(0, -1).slice(-20);
+  const contents   = [...ctxHistory, { role: 'user', parts }];
+
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        systemInstruction: { parts: [{ text: sysPrompt() }] },
+        contents,
+        generationConfig: {
+          temperature: 0.82,
+          maxOutputTokens: 1024,
+          topP: 0.92
+        }
+      })
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error?.message || `API 오류 (${res.status})`);
+
+    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text
+                  || '죄송해, 응답을 받지 못했어. 다시 시도해줘! 😅';
+
+    setTyping(false);
+    setStatus('온라인 · 항상 응답 가능');
+    addAI(reply);
+
+  } catch (err) {
+    console.error(err);
+    history.pop(); // remove failed turn
+    setTyping(false);
+    setStatus('온라인 · 항상 응답 가능');
+    addAI(`앗, 오류가 발생했어! 😅\n\n**오류:** ${err.message}\n\n잠깐 뒤에 다시 시도해봐!`);
+  }
+}
+
+function quickSend(text) {
+  document.getElementById('ia-input').value = text;
+  autoGrow(document.getElementById('ia-input'));
+  sendMsg();
+}
+
+/* ============================================================
+   IMAGE HANDLING
+============================================================ */
+function triggerFilePick() {
+  document.getElementById('file-input').click();
+}
+
+function onFileChange(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const mime = file.type || 'image/jpeg';
+
+  compressImage(file, (b64) => {
+    pendingImg = { data: b64, mime };
+    document.getElementById('img-thumb').src = `data:${mime};base64,${b64}`;
+    document.getElementById('img-preview-wrap').classList.add('show');
+  });
+
+  e.target.value = '';
+}
+
+function compressImage(file, cb) {
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const img = new Image();
+    img.onload = () => {
+      const MAX = 1080;
+      let { width: w, height: h } = img;
+      if (w > MAX || h > MAX) {
+        if (w > h) { h = h / w * MAX; w = MAX; }
+        else       { w = w / h * MAX; h = MAX; }
+      }
+      const cvs = document.createElement('canvas');
+      cvs.width = w; cvs.height = h;
+      cvs.getContext('2d').drawImage(img, 0, 0, w, h);
+      cb(cvs.toDataURL('image/jpeg', 0.88).split(',')[1]);
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearImage() {
+  pendingImg = null;
+  document.getElementById('img-preview-wrap').classList.remove('show');
+  document.getElementById('img-thumb').src = '';
+}
+
+/* ============================================================
+   UI HELPERS
+============================================================ */
+function setTyping(on) {
+  document.getElementById('typing-row').classList.toggle('show', on);
+  if (on) scrollBottom();
+}
+
+function setStatus(txt) {
+  document.getElementById('hd-status').textContent = txt;
+}
+
+function autoGrow(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 100) + 'px';
+}
+
+function onKey(e) {
+  // Desktop only: Enter sends, Shift+Enter = newline
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if (!isMobile && e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMsg();
+  }
+}
+
+/* ============================================================
+   PROFILE MODAL
+============================================================ */
+function openProfile() {
+  const grid = document.getElementById('profile-grid');
+  const tiles = [
+    ['👤','이름', profile.name],
+    ['🎂','나이', profile.age + '세'],
+    ['📏','키',   profile.height + 'cm'],
+    ['⚖️','몸무게', profile.weight + 'kg'],
+    ['📊','BMI',  profile.bmi + ' · ' + bmiLabel(profile.bmi)],
+    ['🎯','목표', profile.goal],
+  ];
+  grid.innerHTML = tiles.map(([icon, label, val]) =>
+    `<div class="profile-tile">
+      <div class="t-icon">${icon}</div>
+      <div class="t-label">${label}</div>
+      <div class="t-val">${val}</div>
+    </div>`
+  ).join('');
+  document.getElementById('profile-modal').classList.add('open');
+}
+
+function onModalBgClick(e) {
+  if (e.target === document.getElementById('profile-modal')) {
+    document.getElementById('profile-modal').classList.remove('open');
+  }
+}
+
+function resetApp() {
+  if (confirm('프로필과 모든 대화 내역을 삭제하고 처음부터 시작할까요?')) {
+    localStorage.clear();
+    location.reload();
+  }
+}
+
+/* ============================================================
+   STORAGE
+============================================================ */
+function saveHistory() {
+  const MAX = 40;
+  if (history.length > MAX) history = history.slice(-MAX);
+  localStorage.setItem('pt_history', JSON.stringify(history));
+}
+
+/* ============================================================
+   iOS VIEWPORT FIX
+============================================================ */
+function fixViewport() {
+  const h = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+  document.getElementById('screen-chat').style.height = h + 'px';
+}
+
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', () => {
+    fixViewport();
+    scrollBottom();
+  });
+}
+window.addEventListener('resize', fixViewport);
+fixViewport();
+
+/* ============================================================
+   BOOTSTRAP
+============================================================ */
+(function boot() {
+  const saved = localStorage.getItem('pt_profile');
+  if (saved) {
+    try {
+      profile = JSON.parse(saved);
+      showChat();
+      return;
+    } catch(e) {
+      localStorage.clear();
+    }
+  }
+  // Show onboarding
+  document.getElementById('screen-onboarding').style.display = 'flex';
+})();
+</script>
+</body>
+</html>
