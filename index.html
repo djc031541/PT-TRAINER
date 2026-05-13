@@ -306,6 +306,52 @@ body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic N
 .add-exercise-btn{margin:8px 14px 0;background:#fff;border:2px dashed #c8e6c9;border-radius:14px;padding:13px;color:#4caf50;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;width:calc(100% - 28px);-webkit-appearance:none;transition:border-color .2s;display:flex;align-items:center;justify-content:center;gap:6px}
 .add-exercise-btn:active{border-color:#4caf50;background:#f0faf0}
 .add-meal-btn{margin:8px 14px 20px!important}
+/* ── 간헐적 단식 카드 ── */
+.if-card{margin:12px 14px 0;background:#fff;border-radius:18px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+.if-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.if-title{font-size:13px;font-weight:700;color:#333;display:flex;align-items:center;gap:6px}
+.if-proto-row{display:flex;gap:6px;margin-bottom:10px}
+.if-proto-btn{flex:1;border:1.5px solid #eee;border-radius:9px;padding:6px 4px;font-size:11px;font-weight:700;font-family:inherit;color:#aaa;cursor:pointer;text-align:center;background:#fff;-webkit-appearance:none}
+.if-proto-btn.sel{border-color:#9c27b0;color:#9c27b0;background:#faf0ff}
+.if-bar-wrap{margin-bottom:8px}
+.if-bar-bg{background:#f0f0f0;border-radius:8px;height:10px;overflow:hidden}
+.if-bar-fill{height:100%;border-radius:8px;transition:width .5s;background:linear-gradient(90deg,#9c27b0,#673ab7)}
+.if-bar-fill.eating{background:linear-gradient(90deg,#4caf50,#388e3c)}
+.if-info{display:flex;justify-content:space-between;margin-top:4px}
+.if-info-txt{font-size:11px;color:#888}
+.if-time{font-size:24px;font-weight:800;color:#333;margin-bottom:4px;text-align:center}
+.if-status{font-size:12px;color:#888;text-align:center;margin-bottom:10px}
+.if-toggle-btn{width:100%;border:none;border-radius:12px;padding:13px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;-webkit-appearance:none;display:flex;align-items:center;justify-content:center;gap:6px}
+.if-toggle-btn.start-fast{background:linear-gradient(135deg,#9c27b0,#673ab7);color:#fff}
+.if-toggle-btn.end-fast{background:linear-gradient(135deg,#ff5722,#d84315);color:#fff}
+/* ── 음식 카메라 버튼 ── */
+.food-cam-area{display:flex;gap:8px;margin:12px 14px 0}
+.food-cam-btn{flex:1;background:linear-gradient(135deg,#4caf50,#2e7d32);border:none;border-radius:14px;padding:15px 10px;color:#fff;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 4px 14px rgba(76,175,80,.3);-webkit-appearance:none}
+.food-cam-btn:active{opacity:.85}
+.food-barcode-btn{flex:1;background:linear-gradient(135deg,#2196f3,#1565c0);border:none;border-radius:14px;padding:15px 10px;color:#fff;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 4px 14px rgba(33,150,243,.3);-webkit-appearance:none}
+.food-barcode-btn:active{opacity:.85}
+/* ── 식사 카테고리 탭 ── */
+.meal-cat-tabs{display:flex;gap:6px;padding:10px 14px 2px;overflow-x:auto;scrollbar-width:none}
+.meal-cat-tabs::-webkit-scrollbar{display:none}
+.mct-btn{background:#f0f0f0;border:none;border-radius:16px;padding:6px 13px;font-size:12px;font-weight:600;font-family:inherit;color:#888;cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-appearance:none;transition:all .15s}
+.mct-btn.active{background:var(--primary);color:#fff}
+/* ── 식사 그룹 ── */
+.meal-group-label{font-size:11px;font-weight:700;color:#aaa;padding:10px 0 6px;margin-top:4px;border-top:1px solid #f0f0f0;display:flex;align-items:center;gap:6px}
+.meal-group-label:first-child{border-top:none;padding-top:0}
+/* ── AI 분석 중 ── */
+.analyzing-row{display:none;align-items:center;gap:10px;background:#f0faf0;border:1.5px solid #c8e6c9;border-radius:13px;padding:12px 14px;margin-bottom:14px}
+.analyzing-row.show{display:flex}
+.analyzing-text{font-size:13px;color:#388e3c;font-weight:600;flex:1}
+.a-dots{display:flex;gap:4px}
+.a-dot{width:7px;height:7px;background:#4caf50;border-radius:50%;animation:bounce 1.2s ease-in-out infinite}
+.a-dot:nth-child(2){animation-delay:.15s}.a-dot:nth-child(3){animation-delay:.3s}
+/* ── 모달 식사 타입 선택 ── */
+.meal-type-row{display:flex;gap:6px;margin-bottom:14px}
+.mt-btn{flex:1;border:1.5px solid #eee;border-radius:10px;padding:8px 2px;font-size:11px;font-weight:600;font-family:inherit;color:#bbb;cursor:pointer;text-align:center;background:#fff;-webkit-appearance:none;transition:all .15s}
+.mt-btn.sel{border-color:var(--primary);color:var(--primary);background:#fff8f5}
+/* ── OR 구분선 ── */
+.or-divider{text-align:center;color:#ccc;font-size:12px;font-weight:600;margin:4px 0 14px;display:flex;align-items:center;gap:8px}
+.or-divider::before,.or-divider::after{content:'';flex:1;height:1px;background:#eee}
 
 /* ══════════════════════════════════════════
    MODALS (shared)
@@ -498,6 +544,31 @@ body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic N
       <h2 style="color:#fff;font-size:18px;font-weight:800">칼로리 트래커 🔥</h2>
       <p style="color:rgba(255,255,255,.5);font-size:12px;margin-top:2px" id="cal-tab-date"></p>
     </div>
+
+    <!-- 간헐적 단식 카드 -->
+    <div class="if-card" id="if-card">
+      <div class="if-header">
+        <div class="if-title">⏱️ 간헐적 단식</div>
+        <div style="font-size:11px;color:#aaa" id="if-next-info"></div>
+      </div>
+      <div class="if-proto-row">
+        <button class="if-proto-btn sel" data-h="14" onclick="setIF(this,14,10)">14:10</button>
+        <button class="if-proto-btn" data-h="16" onclick="setIF(this,16,8)">16:8</button>
+        <button class="if-proto-btn" data-h="18" onclick="setIF(this,18,6)">18:6</button>
+        <button class="if-proto-btn" data-h="20" onclick="setIF(this,20,4)">20:4</button>
+      </div>
+      <div class="if-time" id="if-time">00:00:00</div>
+      <div class="if-status" id="if-status">단식 시작 전</div>
+      <div class="if-bar-wrap">
+        <div class="if-bar-bg"><div class="if-bar-fill" id="if-bar" style="width:0%"></div></div>
+        <div class="if-info">
+          <span class="if-info-txt" id="if-start-lbl">시작: --</span>
+          <span class="if-info-txt" id="if-end-lbl">목표: --</span>
+        </div>
+      </div>
+      <button class="if-toggle-btn start-fast" id="if-toggle-btn" onclick="toggleFast()">🌙 단식 시작</button>
+    </div>
+
     <!-- Balance: 섭취 − 소모 = 순 -->
     <div class="balance-card">
       <div class="bc-col">
@@ -518,7 +589,7 @@ body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic N
         <div class="bc-lbl" id="bc-net-lbl">순섭취</div>
       </div>
     </div>
-    <!-- Goal progress card -->
+    <!-- Goal progress -->
     <div class="goal-card" style="margin-top:12px">
       <div class="goal-row">
         <div class="goal-label">목표 대비 섭취</div>
@@ -547,16 +618,35 @@ body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic N
     </div>
     <!-- Exercise burned -->
     <div class="exercise-section">
-      <div class="meals-section-title"><span>🔥 운동 소모 칼로리</span></div>
+      <div class="meals-section-title"><span>💪 운동 소모 칼로리</span></div>
       <div id="exercise-list"></div>
     </div>
-    <button class="add-exercise-btn" onclick="openAddExercise()">🔥 운동 소모 추가</button>
-    <!-- Food intake -->
-    <div class="meals-section">
-      <div class="meals-section-title"><span>🍽️ 오늘 섭취 식사</span></div>
+    <button class="add-exercise-btn" onclick="openAddExercise()">➕ 운동 소모 직접 추가</button>
+
+    <!-- Food: photo / barcode buttons -->
+    <div class="food-cam-area">
+      <button class="food-cam-btn" onclick="triggerFoodPhoto()">
+        📷 음식 사진으로 추가
+      </button>
+      <button class="food-barcode-btn" onclick="triggerBarcodePhoto()">
+        📦 바코드 스캔
+      </button>
+    </div>
+    <input type="file" id="food-photo-input" accept="image/*" capture="environment" style="display:none" onchange="onFoodPhoto(event,'food')">
+    <input type="file" id="barcode-photo-input" accept="image/*" capture="environment" style="display:none" onchange="onFoodPhoto(event,'barcode')">
+
+    <!-- Meal category tabs -->
+    <div class="meal-cat-tabs">
+      <button class="mct-btn active" onclick="setMealCat('all',this)">전체</button>
+      <button class="mct-btn" onclick="setMealCat('breakfast',this)">🌅 아침</button>
+      <button class="mct-btn" onclick="setMealCat('lunch',this)">🌞 점심</button>
+      <button class="mct-btn" onclick="setMealCat('dinner',this)">🌆 저녁</button>
+      <button class="mct-btn" onclick="setMealCat('snack',this)">🍎 간식</button>
+    </div>
+    <div class="meals-section" style="margin-top:6px">
       <div id="meals-list"></div>
     </div>
-    <button class="add-meal-btn" onclick="openAddMeal()">➕ 음식 추가하기</button>
+    <button class="add-meal-btn" onclick="openAddMeal()">✏️ 직접 입력</button>
   </div>
 
   <!-- BOTTOM NAV -->
@@ -609,10 +699,25 @@ body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic N
 <div class="modal-bg" id="meal-modal" onclick="if(event.target===this)this.classList.remove('open')">
   <div class="modal-sheet">
     <div class="modal-handle"></div>
-    <div class="modal-title">🍽️ 식사 직접 추가</div>
+    <div class="modal-title">🍽️ 음식 기록하기</div>
+    <!-- AI 분석 중 -->
+    <div class="analyzing-row" id="meal-analyzing">
+      <div>
+        <div class="a-dots"><div class="a-dot"></div><div class="a-dot"></div><div class="a-dot"></div></div>
+      </div>
+      <div class="analyzing-text" id="meal-analyzing-text">🤖 AI가 음식/바코드를 분석 중이야...</div>
+    </div>
+    <!-- 식사 타입 -->
+    <div class="meal-type-row">
+      <button class="mt-btn" data-type="breakfast" onclick="selMealType(this)">🌅<br>아침</button>
+      <button class="mt-btn sel" data-type="lunch" onclick="selMealType(this)">🌞<br>점심</button>
+      <button class="mt-btn" data-type="dinner" onclick="selMealType(this)">🌆<br>저녁</button>
+      <button class="mt-btn" data-type="snack" onclick="selMealType(this)">🍎<br>간식</button>
+    </div>
+    <!-- 입력 필드 -->
     <div class="ob-group">
       <label class="ob-label" style="color:#555">음식 이름</label>
-      <input type="text" class="modal-input" id="meal-name-input" placeholder="예: 닭가슴살 샐러드" autocomplete="off">
+      <input type="text" class="modal-input" id="meal-name-input" placeholder="예: 닭가슴살 샐러드" autocomplete="off" style="-webkit-user-select:text;user-select:text">
     </div>
     <div class="modal-row">
       <div style="flex:1">
@@ -622,16 +727,16 @@ body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic N
     </div>
     <div class="modal-row">
       <div style="flex:1">
-        <label class="ob-label" style="color:#555">단백질 (g)</label>
-        <input type="number" class="modal-input" id="meal-protein-input" placeholder="30" inputmode="decimal">
+        <label class="ob-label" style="color:#555">단백질</label>
+        <input type="number" class="modal-input" id="meal-protein-input" placeholder="30g" inputmode="decimal">
       </div>
       <div style="flex:1">
-        <label class="ob-label" style="color:#555">탄수화물 (g)</label>
-        <input type="number" class="modal-input" id="meal-carb-input" placeholder="20" inputmode="decimal">
+        <label class="ob-label" style="color:#555">탄수화물</label>
+        <input type="number" class="modal-input" id="meal-carb-input" placeholder="20g" inputmode="decimal">
       </div>
       <div style="flex:1">
-        <label class="ob-label" style="color:#555">지방 (g)</label>
-        <input type="number" class="modal-input" id="meal-fat-input" placeholder="10" inputmode="decimal">
+        <label class="ob-label" style="color:#555">지방</label>
+        <input type="number" class="modal-input" id="meal-fat-input" placeholder="10g" inputmode="decimal">
       </div>
     </div>
     <button class="modal-save-btn" onclick="confirmAddMeal()">추가하기</button>
@@ -708,6 +813,9 @@ let history    = [];      // [{role:'user'|'assistant', text}]
 let pendingImg = null;    // {data, mime}
 let pendingRoutineText = null;
 let calYear, calMonth;   // calendar view
+let currentMealCat = 'all'; // 칼로리 탭 필터: all/breakfast/lunch/dinner/snack
+let currentMealType = 'lunch'; // 모달에서 선택된 식사 타입
+let ifTimer = null; // 간헐적 단식 타이머
 
 // 건강검진 데이터 (2025.12.11 국민건강보험공단)
 const HEALTH_DATA = {
@@ -775,6 +883,7 @@ function showApp() {
   renderCalories();
   renderRoutines();
   updateCalBadge();
+  // IF 타이머는 칼로리 탭 방문 시 시작
 }
 
 /* ══════════════════════════════════════════════════
@@ -789,7 +898,7 @@ function switchTab(tab) {
   currentTab = tab;
   if (tab === 'calendar') { renderCalendar(); updateStreak(); }
   if (tab === 'routines') renderRoutines();
-  if (tab === 'calories') renderCalories();
+  if (tab === 'calories') { renderCalories(); startIFTimer(); }
   fixViewport();
 }
 
@@ -874,7 +983,16 @@ function addAI(text, saveHist = true) {
     chipsHtml += `<button class="msg-chip" onclick="offerCalorie(${cals},this)">🍽️ ${cals}kcal 섭취 기록</button>`;
   }
   if (exCals) {
-    chipsHtml += `<button class="msg-chip" style="border-color:#4caf50;color:#4caf50" onclick="offerExercise(${exCals},this)">🔥 ${exCals}kcal 소모 기록</button>`;
+    // 애플워치 사진이면 자동 기록
+    const workoutName = extractWorkoutName(text);
+    if (isWorkout && pendingImg === null) {
+      // 방금 이미지 분석 후라면 자동 추가
+      addExerciseEntry(workoutName, exCals);
+      showToast(`🔥 ${workoutName} ${exCals}kcal 운동 소모 자동 기록됐어!`);
+      chipsHtml += `<button class="msg-chip" style="border-color:#4caf50;color:#4caf50;opacity:.6;cursor:default">✅ ${exCals}kcal 소모 기록 완료</button>`;
+    } else {
+      chipsHtml += `<button class="msg-chip" style="border-color:#4caf50;color:#4caf50" onclick="offerExercise(${exCals},this)">🔥 ${exCals}kcal 소모 기록</button>`;
+    }
   }
   if (isWorkout || exCals) {
     chipsHtml += `<button class="msg-chip" onclick="markTodayFromChat(this)">📅 오늘 운동 완료 기록</button>`;
@@ -1036,17 +1154,31 @@ function extractExerciseCals(text) {
   }
   return null;
 }
+function extractWorkoutName(text) {
+  const types = [
+    ['사이클링','사이클링'],['자전거','실내자전거'],['즈위프트','즈위프트'],
+    ['달리기','달리기'],['러닝','러닝'],['조깅','조깅'],
+    ['걷기','걷기'],['산책','산책'],['등산','등산'],
+    ['수영','수영'],['배틀 로프','배틀로프'],['스텝퍼','스텝퍼'],
+    ['HIIT','HIIT'],['유산소','유산소운동'],['근력','근력운동'],
+  ];
+  for (const [kw, name] of types) {
+    if (text.includes(kw)) return name;
+  }
+  return '운동';
+}
 
 /* ── INLINE CHIP ACTIONS ── */
 function offerCalorie(cal, btn) {
   const parentChips = btn.closest('.msg-chips');
-  // get the ai bubble text from the previous sibling
   const aiRow = parentChips.previousElementSibling;
   const bubbleText = aiRow?.dataset?.text || '';
   const macros = extractMacros(bubbleText);
   const name = prompt(`음식 이름을 입력해줘 (칼로리: ${cal}kcal)`, '');
   if (!name) return;
-  addMealEntry(name, cal, macros.protein, macros.carb, macros.fat);
+  const h = new Date().getHours();
+  const mt = h < 10 ? 'breakfast' : h < 14 ? 'lunch' : h < 20 ? 'dinner' : 'snack';
+  addMealEntry(name, cal, macros.protein, macros.carb, macros.fat, mt);
   btn.textContent = '✅ 기록 완료!';
   btn.disabled = true;
   showToast(`🍽️ ${name} (${cal}kcal) 오늘 기록에 추가됐어!`);
@@ -1375,15 +1507,17 @@ function saveTodayMeals(meals) {
   all[todayStr()] = meals;
   localStorage.setItem('pt_calories', JSON.stringify(all));
 }
-function addMealEntry(name, cal, protein=0, carb=0, fat=0) {
+function addMealEntry(name, cal, protein=0, carb=0, fat=0, mealType='snack') {
   const meals = getTodayMeals();
-  meals.push({ name, cal: parseInt(cal)||0, protein: parseInt(protein)||0, carb: parseInt(carb)||0, fat: parseInt(fat)||0, time: nowTime() });
+  meals.push({ name, cal: parseInt(cal)||0, protein: parseInt(protein)||0,
+    carb: parseInt(carb)||0, fat: parseInt(fat)||0, time: nowTime(), mealType });
   saveTodayMeals(meals);
 }
 function deleteMeal(idx) {
-  const meals = getTodayMeals();
-  meals.splice(idx, 1);
-  saveTodayMeals(meals);
+  const allMeals = getTodayMeals();
+  // idx is absolute index into full list
+  allMeals.splice(idx, 1);
+  saveTodayMeals(allMeals);
   renderCalories();
 }
 
@@ -1522,24 +1656,43 @@ function renderCalories() {
     }
   }
 
-  // Meal list
+  // Meal list — grouped by category
   const list = document.getElementById('meals-list');
   if (list) {
-    if (meals.length === 0) {
-      list.innerHTML = '<div class="meals-empty">🍽️ 아직 기록된 식사가 없어!<br>음식 사진을 찍어 올려봐!</div>';
+    const catOrder = ['breakfast','lunch','dinner','snack'];
+    const catLabel = { breakfast:'🌅 아침', lunch:'🌞 점심', dinner:'🌆 저녁', snack:'🍎 간식' };
+    const filtered = currentMealCat === 'all' ? meals : meals.filter(m => m.mealType === currentMealCat);
+    if (filtered.length === 0) {
+      list.innerHTML = `<div class="meals-empty">🍽️ ${currentMealCat==='all'?'아직 기록된 식사가 없어! 위 버튼으로 사진을 찍어봐!':'해당 시간대 식사 기록이 없어!'}</div>`;
+    } else if (currentMealCat !== 'all') {
+      list.innerHTML = filtered.map((m) => {
+        const i = meals.indexOf(m);
+        return mealItemHtml(m, i);
+      }).join('');
     } else {
-      list.innerHTML = meals.map((m, i) => `
-        <div class="meal-item">
-          <div class="meal-icon">${mealIcon(m.name)}</div>
-          <div class="meal-info">
-            <div class="meal-name">${esc2(m.name)}</div>
-            <div class="meal-time">${m.time}</div>
-          </div>
-          <div class="meal-cal">${m.cal}kcal</div>
-          <button class="meal-del" onclick="deleteMeal(${i})">🗑</button>
-        </div>`).join('');
+      // Group by category
+      let html = '';
+      catOrder.forEach(cat => {
+        const group = meals.map((m, i) => ({m, i})).filter(({m}) => (m.mealType||'snack') === cat);
+        if (group.length === 0) return;
+        html += `<div class="meal-group-label">${catLabel[cat]}</div>`;
+        html += group.map(({m, i}) => mealItemHtml(m, i)).join('');
+      });
+      list.innerHTML = html;
     }
   }
+}
+
+function mealItemHtml(m, i) {
+  return `<div class="meal-item">
+    <div class="meal-icon">${mealIcon(m.name)}</div>
+    <div class="meal-info">
+      <div class="meal-name">${esc2(m.name)}</div>
+      <div class="meal-time">${m.time}</div>
+    </div>
+    <div class="meal-cal">${m.cal}kcal</div>
+    <button class="meal-del" onclick="deleteMeal(${i})">🗑</button>
+  </div>`;
 }
 
 function mealIcon(name) {
@@ -1557,11 +1710,35 @@ function mealIcon(name) {
   return '🍽️';
 }
 
-function openAddMeal() {
+function selMealType(btn) {
+  currentMealType = btn.dataset.type;
+  document.querySelectorAll('.mt-btn').forEach(b => b.classList.toggle('sel', b === btn));
+}
+function autoSelMealType() {
+  // 시간대 기준으로 기본 식사 타입 자동 선택
+  const h = new Date().getHours();
+  let t = h < 10 ? 'breakfast' : h < 14 ? 'lunch' : h < 20 ? 'dinner' : 'snack';
+  currentMealType = t;
+  document.querySelectorAll('.mt-btn').forEach(b => b.classList.toggle('sel', b.dataset.type === t));
+}
+function openAddMeal(prefill) {
   ['meal-name-input','meal-cal-input','meal-protein-input','meal-carb-input','meal-fat-input']
     .forEach(id => document.getElementById(id).value = '');
+  document.getElementById('meal-analyzing').classList.remove('show');
+  autoSelMealType();
+  if (prefill) {
+    if (prefill.name) document.getElementById('meal-name-input').value = prefill.name;
+    if (prefill.cal)  document.getElementById('meal-cal-input').value  = prefill.cal;
+    if (prefill.protein) document.getElementById('meal-protein-input').value = prefill.protein;
+    if (prefill.carb)    document.getElementById('meal-carb-input').value    = prefill.carb;
+    if (prefill.fat)     document.getElementById('meal-fat-input').value     = prefill.fat;
+    if (prefill.mealType) {
+      currentMealType = prefill.mealType;
+      document.querySelectorAll('.mt-btn').forEach(b => b.classList.toggle('sel', b.dataset.type === prefill.mealType));
+    }
+  }
   document.getElementById('meal-modal').classList.add('open');
-  setTimeout(() => document.getElementById('meal-name-input').focus(), 300);
+  if (!prefill) setTimeout(() => document.getElementById('meal-name-input').focus(), 300);
 }
 function confirmAddMeal() {
   const name    = document.getElementById('meal-name-input').value.trim();
@@ -1571,10 +1748,181 @@ function confirmAddMeal() {
   const fat     = parseFloat(document.getElementById('meal-fat-input').value) || 0;
   if (!name) { alert('음식 이름을 입력해줘!'); return; }
   if (!cal)  { alert('칼로리를 입력해줘!'); return; }
-  addMealEntry(name, cal, protein, carb, fat);
+  addMealEntry(name, cal, protein, carb, fat, currentMealType);
   document.getElementById('meal-modal').classList.remove('open');
   renderCalories();
   showToast(`🍽️ ${name} (${cal}kcal) 기록됐어!`);
+}
+
+/* ── 식사 카테고리 필터 ── */
+function setMealCat(cat, btn) {
+  currentMealCat = cat;
+  document.querySelectorAll('.mct-btn').forEach(b => b.classList.toggle('active', b === btn));
+  renderCalories();
+}
+
+/* ── 음식 사진/바코드 분석 ── */
+function triggerFoodPhoto()    { document.getElementById('food-photo-input').click(); }
+function triggerBarcodePhoto() { document.getElementById('barcode-photo-input').click(); }
+
+function onFoodPhoto(e, mode) {
+  const file = e.target.files[0]; if (!file) return;
+  e.target.value = '';
+  // 모달 열고 분석 시작
+  openAddMeal();
+  document.getElementById('meal-analyzing').classList.add('show');
+  document.getElementById('meal-analyzing-text').textContent =
+    mode === 'barcode' ? '📦 바코드 스캔 중...' : '🤖 AI가 음식을 분석 중이야...';
+
+  compressImg(file, async b64 => {
+    try {
+      const result = await analyzeFoodImage(b64, mode);
+      document.getElementById('meal-analyzing').classList.remove('show');
+      // 모달 필드 채우기
+      if (result.name) document.getElementById('meal-name-input').value = result.name;
+      if (result.cal)  document.getElementById('meal-cal-input').value  = result.cal;
+      if (result.protein) document.getElementById('meal-protein-input').value = result.protein;
+      if (result.carb)    document.getElementById('meal-carb-input').value    = result.carb;
+      if (result.fat)     document.getElementById('meal-fat-input').value     = result.fat;
+      if (result.mealType) {
+        currentMealType = result.mealType;
+        document.querySelectorAll('.mt-btn').forEach(b => b.classList.toggle('sel', b.dataset.type === result.mealType));
+      }
+      showToast('✅ AI 분석 완료! 수정 후 추가해줘.');
+    } catch(err) {
+      document.getElementById('meal-analyzing').classList.remove('show');
+      showToast('⚠️ 분석 실패. 직접 입력해줘!');
+    }
+  });
+}
+
+async function analyzeFoodImage(b64, mode) {
+  const key = getKey();
+  if (!key) { openKeyModal(); throw new Error('API 키 없음'); }
+  const h = new Date().getHours();
+  const timeHint = h < 10 ? 'breakfast' : h < 14 ? 'lunch' : h < 20 ? 'dinner' : 'snack';
+  const prompt = mode === 'barcode'
+    ? `이 바코드 이미지를 스캔해서 제품명과 영양성분을 분석해줘. 반드시 다음 JSON 형식만 응답 (다른 텍스트 금지): {"name":"제품명","cal":칼로리숫자,"protein":단백질g숫자,"carb":탄수화물g숫자,"fat":지방g숫자,"mealType":"${timeHint}"}`
+    : `이 음식 사진을 분석해줘. 음식 종류와 대략적인 양을 파악해서 칼로리/영양성분을 추정해. 반드시 다음 JSON 형식만 응답 (다른 텍스트 금지): {"name":"음식명(한국어)","cal":칼로리숫자,"protein":단백질g숫자,"carb":탄수화물g숫자,"fat":지방g숫자,"mealType":"${timeHint}"}`;
+
+  const res = await fetch(CLAUDE_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': key,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: MODEL,
+      max_tokens: 300,
+      system: '음식/바코드 분석 전문가. JSON 형식으로만 응답.',
+      messages: [{ role: 'user', content: [
+        { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: b64 } },
+        { type: 'text',  text: prompt }
+      ]}]
+    })
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error?.message || '분석 오류');
+  const text = data.content?.[0]?.text || '';
+  // JSON 파싱 시도
+  const match = text.match(/\{[\s\S]*\}/);
+  if (!match) throw new Error('JSON 파싱 실패');
+  return JSON.parse(match[0]);
+}
+
+/* ── 간헐적 단식 (IF) ── */
+function getIFState() {
+  try { return JSON.parse(localStorage.getItem('pt_if') || '{}'); } catch(e) { return {}; }
+}
+function saveIFState(s) { localStorage.setItem('pt_if', JSON.stringify(s)); }
+
+function setIF(btn, fastH, eatH) {
+  document.querySelectorAll('.if-proto-btn').forEach(b => b.classList.toggle('sel', b === btn));
+  const s = getIFState();
+  s.fastHours = fastH; s.eatHours = eatH;
+  saveIFState(s);
+  renderIFCard();
+}
+
+function toggleFast() {
+  const s = getIFState();
+  if (s.active) {
+    // 단식 종료
+    s.active = false; s.startTime = null;
+    saveIFState(s);
+    showToast('🍽️ 단식 종료! 맛있게 먹어!');
+  } else {
+    // 단식 시작
+    s.active = true; s.startTime = new Date().toISOString();
+    if (!s.fastHours) s.fastHours = 14;
+    saveIFState(s);
+    showToast('🌙 단식 시작! 파이팅!');
+  }
+  renderIFCard();
+}
+
+function startIFTimer() {
+  if (ifTimer) clearInterval(ifTimer);
+  renderIFCard();
+  ifTimer = setInterval(renderIFCard, 1000);
+}
+
+function renderIFCard() {
+  const s = getIFState();
+  const fastH = s.fastHours || 14;
+  const eatH  = s.eatHours  || 10;
+
+  // 프로토콜 버튼 상태
+  document.querySelectorAll('.if-proto-btn').forEach(b => {
+    b.classList.toggle('sel', parseInt(b.dataset.h) === fastH);
+  });
+
+  const timeEl   = document.getElementById('if-time');
+  const statusEl = document.getElementById('if-status');
+  const barEl    = document.getElementById('if-bar');
+  const toggleEl = document.getElementById('if-toggle-btn');
+  const startLbl = document.getElementById('if-start-lbl');
+  const endLbl   = document.getElementById('if-end-lbl');
+  if (!timeEl) return;
+
+  if (!s.active || !s.startTime) {
+    timeEl.textContent   = `${fastH}:${String(eatH).padStart(2,'0')} 단식`;
+    statusEl.textContent = '단식 시작 전 · 버튼을 눌러 시작해봐!';
+    if (barEl)    { barEl.style.width = '0%'; barEl.className = 'if-bar-fill'; }
+    if (toggleEl) { toggleEl.textContent = '🌙 단식 시작'; toggleEl.className = 'if-toggle-btn start-fast'; }
+    if (startLbl) startLbl.textContent = '시작: --';
+    if (endLbl)   endLbl.textContent   = `목표: ${fastH}시간 후`;
+    return;
+  }
+
+  const start   = new Date(s.startTime);
+  const now     = new Date();
+  const elapsed = (now - start) / 1000; // seconds
+  const targetS = fastH * 3600;
+  const pct     = Math.min(elapsed / targetS * 100, 100);
+
+  const h = Math.floor(elapsed / 3600);
+  const m = Math.floor((elapsed % 3600) / 60);
+  const sec = Math.floor(elapsed % 60);
+  timeEl.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+
+  const targetDate = new Date(start.getTime() + targetS * 1000);
+  const fmtTime = d => d.toLocaleTimeString('ko-KR', {hour:'2-digit',minute:'2-digit'});
+
+  if (elapsed >= targetS) {
+    statusEl.textContent = '🎉 단식 목표 달성! 식사 가능해!';
+    if (barEl) { barEl.style.width = '100%'; barEl.className = 'if-bar-fill eating'; }
+  } else {
+    const remain = targetS - elapsed;
+    const rh = Math.floor(remain / 3600), rm = Math.floor((remain % 3600) / 60);
+    statusEl.textContent = `단식 중 · ${rh}시간 ${rm}분 후 식사 가능 🍽️`;
+    if (barEl) { barEl.style.width = pct + '%'; barEl.className = 'if-bar-fill'; }
+  }
+  if (startLbl) startLbl.textContent = `시작: ${fmtTime(start)}`;
+  if (endLbl)   endLbl.textContent   = `목표: ${fmtTime(targetDate)}`;
+  if (toggleEl) { toggleEl.textContent = '🍽️ 단식 종료'; toggleEl.className = 'if-toggle-btn end-fast'; }
 }
 
 function openAddExercise() {
