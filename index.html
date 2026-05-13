@@ -579,7 +579,19 @@ body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic N
 ══════════════════════════════════════════════════ */
 const CLAUDE_URL = 'https://api.anthropic.com/v1/messages';
 const MODEL      = 'claude-sonnet-4-6';
-function getKey() { return localStorage.getItem('pt_claude_key') || ''; }
+// iOS 자동교정 문자 복원 후 비ASCII 제거
+function sanitizeKey(raw) {
+  return raw
+    .replace(/—/g, '--')   // em 대시(—) → -- (iOS가 -- 를 — 로 바꿈)
+    .replace(/–/g, '-')    // en 대시(–) → -
+    .replace(/‘|’/g, "'")  // 스마트 따옴표
+    .replace(/“|”/g, '"')
+    .replace(/[^\x20-\x7E]/g, '')   // 나머지 비ASCII 전부 제거
+    .trim();
+}
+function getKey() {
+  return sanitizeKey(localStorage.getItem('pt_claude_key') || '');
+}
 
 /* ══════════════════════════════════════════════════
    STATE
@@ -810,7 +822,15 @@ function nowTime() {
   const ap = h >= 12 ? '오후' : '오전'; h = h%12||12;
   return `${ap} ${h}:${String(m).padStart(2,'0')}`;
 }
-function scrollBottom() { const el = document.getElementById('chat-msgs'); setTimeout(() => el.scrollTop = el.scrollHeight, 60); }
+function scrollBottom() {
+  const el = document.getElementById('chat-msgs');
+  if (!el) return;
+  // requestAnimationFrame + setTimeout 조합으로 iOS 렌더링 완료 후 스크롤
+  requestAnimationFrame(() => {
+    el.scrollTop = el.scrollHeight;
+    setTimeout(() => { el.scrollTop = el.scrollHeight; }, 120);
+  });
+}
 
 /* ── SEND ── */
 async function sendMsg() {
@@ -1399,7 +1419,8 @@ function toggleKeyVis() {
   inp.type = document.getElementById('key-show').checked ? 'text' : 'password';
 }
 function saveKey() {
-  const key = document.getElementById('key-input').value.trim();
+  // 붙여넣기 오염 문자(유니코드 공백, BOM 등) 제거
+  const key = sanitizeKey(document.getElementById('key-input').value);
   if (!key.startsWith('sk-ant-')) { alert('올바른 Claude API 키를 입력해줘! (sk-ant-... 형식)'); return; }
   localStorage.setItem('pt_claude_key', key);
   document.getElementById('key-modal').classList.remove('open');
@@ -1438,12 +1459,30 @@ function saveHistory() {
    VIEWPORT FIX (iOS keyboard)
 ══════════════════════════════════════════════════ */
 function fixViewport() {
-  const h = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+  const vp = window.visualViewport;
+  const h  = vp ? vp.height : window.innerHeight;
   const app = document.getElementById('screen-app');
-  if (app && app.classList.contains('visible')) app.style.height = h + 'px';
+  if (!app || !app.classList.contains('visible')) return;
+
+  // 스크롤 위치 보존: 키보드 열릴 때 채팅창이 맨위로 튀는 현상 방지
+  const msgs = document.getElementById('chat-msgs');
+  const atBottom = msgs
+    ? msgs.scrollHeight - msgs.scrollTop - msgs.clientHeight < 80
+    : true;
+
+  app.style.height = h + 'px';
+
+  // 기존에 맨 아래였으면 키보드 열린 후에도 맨 아래 유지
+  if (currentTab === 'chat' && atBottom) {
+    requestAnimationFrame(() => {
+      if (msgs) msgs.scrollTop = msgs.scrollHeight;
+    });
+  }
 }
+
 if (window.visualViewport) {
-  window.visualViewport.addEventListener('resize', () => { fixViewport(); if(currentTab==='chat') scrollBottom(); });
+  window.visualViewport.addEventListener('resize', fixViewport);
+  window.visualViewport.addEventListener('scroll', fixViewport);
 }
 window.addEventListener('resize', fixViewport);
 fixViewport();
