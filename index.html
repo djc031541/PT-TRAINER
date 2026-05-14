@@ -995,40 +995,50 @@ function sysPrompt() {
 🏠 보유 운동기구: 맨몸운동, 아령/덤벨(긴것·짧은것), 벽 로잉, 배틀 로프, ABP 슬라이더, 스텝퍼, 트위스터, 실내자전거(즈위프트 연동), 야외 산책/등산
 
 📌 이미지 분석:
-1. ⌚ 애플워치 운동 기록 → 운동 종류·시간·소모칼로리·심박수 분석 + 심박수가 목표범위(최대심박수의 60~75%)에 맞는지 평가 + 이어서 할 추천 세트(세트×횟수 명시) + 쿨다운. 소모칼로리는 반드시 "소모 칼로리: XXXkcal" 형식 포함.
-2. 🍽️ 음식 사진/바코드 → 한국 식품의약품안전처 식품영양성분DB + 농촌진흥청 식품성분표 + USDA FoodData Central 기준으로 정확한 칼로리·영양소 계산. 반드시 "총 약 XXXkcal (단백질 XXg / 탄수화물 XXg / 지방 XXg)" 형식 포함. 고혈압이므로 나트륨 높은 음식 경고. 음식명을 **굵게** 먼저 표시.
+1. ⌚ 애플워치/운동 사진 → 운동 종류·시간·소모칼로리·심박수 분석, 심박수 목표범위(최대심박수 60~75%) 평가, 추천 세트(세트×횟수), 쿨다운 안내.
+2. 🍽️ 음식/바코드 사진 → 한국 식약처 식품영양성분DB + 농촌진흥청 + USDA 기준 칼로리·영양소 계산. 음식명 **굵게** 먼저 표시. 고혈압이므로 나트륨 높은 음식 경고.
+
+🔴 【자동기록 태그 — 절대 규칙】 이미지가 포함된 메시지에 응답할 때 반드시 응답 맨 끝에 다음 태그 중 하나를 한 줄로 추가 (형식 절대 변경 금지, 다른 텍스트 추가 금지):
+음식/음료/바코드: [RECORD:{"t":"food","name":"음식명","cal":칼로리정수,"p":단백질g정수,"k":탄수화물g정수,"f":지방g정수}]
+운동/워치/소모: [RECORD:{"t":"ex","name":"운동명","cal":소모칼로리정수}]
+이미지 없거나 해당없음: [RECORD:{"t":"none"}]
 
 💡 답변: 반말, 핵심 위주(300-400자), 격려로 마무리, 마크다운 **굵은글씨** 사용 가능`;
 }
 
 /* addAI: 라이브 메시지 (chips 포함, 히스토리 저장, 자동기록)
-   fromImg=true면 사진 응답 → 음식/운동 자동기록 */
-function addAI(text, saveHist = true, fromImg = false) {
-  const msgs = document.getElementById('chat-msgs');
+   fromImg=true면 [RECORD:{...}] 태그 파싱 → 칼로리/운동 자동기록 */
+function addAI(rawText, saveHist = true, fromImg = false) {
+  // ── [RECORD:{...}] 태그 파싱 (화면에는 숨김) ──
+  let text = rawText;
+  let autoRecord = null;
+  const recMatch = rawText.match(/\[RECORD:(\{.*?\})\]/);
+  if (recMatch) {
+    try { autoRecord = JSON.parse(recMatch[1]); } catch(e) {}
+    text = rawText.replace(/\[RECORD:\{.*?\}\]\s*/g, '').trimEnd();
+  }
 
-  // 날짜 구분선: 오늘 날짜가 이전 메시지와 다를 경우
+  const msgs = document.getElementById('chat-msgs');
   ensureDateSep(msgs);
 
-  const cals     = extractCals(text);
-  const exCals   = extractExerciseCals(text);
-  const isWorkout= detectWorkout(text);
-
-  // ── 자동 기록 (사진 첨부 응답일 때만) ──
-  if (fromImg) {
-    const h = new Date().getHours();
+  // ── 자동 기록 ──
+  if (fromImg && autoRecord && autoRecord.t !== 'none') {
+    const h  = new Date().getHours();
     const mt = h < 10 ? 'breakfast' : h < 14 ? 'lunch' : h < 20 ? 'dinner' : 'snack';
-    if (exCals && isWorkout) {
-      // 애플워치 운동 → 자동 운동 기록
-      const wName = extractWorkoutName(text);
-      addExerciseEntry(wName, exCals);
+    if (autoRecord.t === 'food' && autoRecord.cal > 0) {
+      addMealEntry(autoRecord.name || '음식', autoRecord.cal,
+        autoRecord.p||0, autoRecord.k||0, autoRecord.f||0, mt);
+      setTimeout(() => {
+        showToast(`🍽️ ${autoRecord.name} ${autoRecord.cal}kcal 칼로리 탭에 자동 기록됐어!`);
+        if (currentTab === 'calories') renderCalories();
+      }, 500);
+    } else if (autoRecord.t === 'ex' && autoRecord.cal > 0) {
+      addExerciseEntry(autoRecord.name || '운동', autoRecord.cal);
       markToday();
-      setTimeout(() => showToast(`✅ ${wName} ${exCals}kcal 소모 자동 기록됐어! 캘린더도 체크됨 📅`), 600);
-    } else if (cals && !isWorkout) {
-      // 음식 사진 → 자동 칼로리 기록
-      const fName = extractFoodName(text);
-      const macros = extractMacros(text);
-      addMealEntry(fName, cals, macros.protein, macros.carb, macros.fat, mt);
-      setTimeout(() => showToast(`✅ ${fName} ${cals}kcal 자동 기록됐어! 🍽️`), 600);
+      setTimeout(() => {
+        showToast(`💪 ${autoRecord.name} ${autoRecord.cal}kcal 소모! 운동 탭 자동 기록 + 캘린더 체크 완료!`);
+        if (currentTab === 'calories') renderCalories();
+      }, 500);
     }
   }
 
@@ -1036,18 +1046,22 @@ function addAI(text, saveHist = true, fromImg = false) {
   addAIBubble(text, true);
 
   // ── 액션 칩 ──
-  let chipsHtml = '';
-  if (cals && !fromImg) {
+  const cals     = extractCals(text);
+  const exCals   = extractExerciseCals(text);
+  const isWorkout= detectWorkout(text);
+  let chipsHtml  = '';
+
+  if (autoRecord && autoRecord.t === 'food') {
+    chipsHtml += `<button class="msg-chip" style="opacity:.6;cursor:default;font-size:11px">✅ ${autoRecord.cal}kcal 칼로리 탭 자동 기록 완료</button>`;
+  } else if (cals) {
     chipsHtml += `<button class="msg-chip" onclick="offerCalorie(${cals},this)">🍽️ ${cals}kcal 섭취 기록</button>`;
-  } else if (cals && fromImg && !isWorkout) {
-    chipsHtml += `<button class="msg-chip" style="opacity:.55;cursor:default">✅ 칼로리 자동 기록 완료</button>`;
   }
-  if (exCals && !fromImg) {
+  if (autoRecord && autoRecord.t === 'ex') {
+    chipsHtml += `<button class="msg-chip" style="border-color:#4caf50;color:#4caf50;opacity:.6;cursor:default;font-size:11px">✅ ${autoRecord.cal}kcal 소모 자동 기록 완료</button>`;
+  } else if (exCals) {
     chipsHtml += `<button class="msg-chip" style="border-color:#4caf50;color:#4caf50" onclick="offerExercise(${exCals},this)">🔥 ${exCals}kcal 소모 기록</button>`;
-  } else if (exCals && fromImg && isWorkout) {
-    chipsHtml += `<button class="msg-chip" style="border-color:#4caf50;color:#4caf50;opacity:.55;cursor:default">✅ 운동 자동 기록 완료</button>`;
   }
-  if (isWorkout || exCals) {
+  if (isWorkout || exCals || (autoRecord && autoRecord.t === 'ex')) {
     chipsHtml += `<button class="msg-chip" onclick="markTodayFromChat(this)">📅 운동 완료 기록</button>`;
   }
   chipsHtml += `<button class="msg-chip" onclick="promptSaveRoutine(this)">📌 루틴 저장</button>`;
@@ -1055,7 +1069,7 @@ function addAI(text, saveHist = true, fromImg = false) {
   const chips = document.createElement('div');
   chips.className = 'msg-chips';
   chips.innerHTML = chipsHtml;
-  document.getElementById('chat-msgs').appendChild(chips);
+  msgs.appendChild(chips);
 
   if (saveHist) {
     history.push({ role: 'assistant', text, date: todayStr(), time: nowTime() });
