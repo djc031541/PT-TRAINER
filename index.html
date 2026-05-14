@@ -909,23 +909,55 @@ function initChat() {
   const d = new Date();
   document.getElementById('today-label').textContent =
     d.toLocaleDateString('ko-KR', {month:'long', day:'numeric', weekday:'long'});
-  const saved = localStorage.getItem('pt_history');
-  if (saved) {
-    try {
+
+  // 저장된 히스토리 로드
+  try {
+    const saved = localStorage.getItem('pt_history');
+    if (saved) {
       const p = JSON.parse(saved);
       history = p.filter(h => h.text !== undefined && (h.role==='user'||h.role==='assistant'));
-    } catch(e) { history = []; }
+    }
+  } catch(e) { history = []; }
+
+  if (history.length === 0) {
+    // 첫 실행 → 인사 메시지
+    setTimeout(() => {
+      const bmi = profile.bmi;
+      const txt = `안녕, ${profile.name}! 😄 나는 PT 코치 맥스야!\n\n` +
+        `📋 **내 프로필**\n• 키 ${profile.height}cm · 몸무게 ${profile.weight}kg\n` +
+        `• BMI ${bmi} (${bmiLabel(bmi)}) · 목표: ${profile.goal}\n\n` +
+        `${bmiMotivation()}\n\n` +
+        `📸 **사진 분석 기능:**\n• 📷 **음식/바코드 사진** → AI가 칼로리 분석 후 **자동 기록**\n` +
+        `• ⌚ **애플워치 사진** → 운동 소모 칼로리 **자동 기록**\n• 아래 탭에서 캘린더·루틴·칼로리도 확인해줘! 💪`;
+      addAI(txt, false);
+    }, 400);
+  } else {
+    // 기존 대화 전체 렌더링 (날짜별 구분)
+    const msgs = document.getElementById('chat-msgs');
+    let lastDate = '';
+    for (let i = 0; i < history.length; i++) {
+      const msg = history[i];
+      const msgDate = msg.date || todayStr();
+      if (msgDate !== lastDate) {
+        // 날짜 구분선
+        const sep = document.createElement('div');
+        sep.className = 'date-sep';
+        try {
+          const dObj = new Date(msgDate);
+          const isToday = msgDate === todayStr();
+          sep.innerHTML = `<span>${isToday ? '오늘' : dObj.toLocaleDateString('ko-KR', {month:'long',day:'numeric',weekday:'short'})}</span>`;
+        } catch(e) { sep.innerHTML = `<span>${msgDate}</span>`; }
+        msgs.appendChild(sep);
+        lastDate = msgDate;
+      }
+      if (msg.role === 'user') {
+        addUserBubble(msg.text, msg.imgSrc || null, false);
+      } else {
+        addAIBubble(msg.text, false);
+      }
+    }
+    requestAnimationFrame(() => scrollBottom());
   }
-  setTimeout(() => {
-    const bmi = profile.bmi;
-    const txt = `안녕, ${profile.name}! 😄 나는 PT 코치 맥스야!\n\n` +
-      `📋 **내 프로필**\n• 키 ${profile.height}cm · 몸무게 ${profile.weight}kg\n` +
-      `• BMI ${bmi} (${bmiLabel(bmi)}) · 목표: ${profile.goal}\n\n` +
-      `${bmiMotivation()}\n\n` +
-      `📸 **이렇게 사용해봐!**\n• 애플워치 사진 → 운동 분석 + 추천 세트\n` +
-      `• 음식/바코드 사진 → 칼로리 분석 후 자동 기록\n• 아래 탭에서 캘린더·루틴·칼로리도 확인해줘! 💪`;
-    addAI(txt, false);
-  }, 400);
 }
 
 function bmiMotivation() {
@@ -963,42 +995,80 @@ function sysPrompt() {
 🏠 보유 운동기구: 맨몸운동, 아령/덤벨(긴것·짧은것), 벽 로잉, 배틀 로프, ABP 슬라이더, 스텝퍼, 트위스터, 실내자전거(즈위프트 연동), 야외 산책/등산
 
 📌 이미지 분석:
-1. 애플워치 운동 기록 → 운동 종류·시간·소모칼로리·심박수 분석 + 심박수가 목표범위(최대심박수의 60~75%)에 맞는지 평가 + 이어서 할 추천 세트(세트×횟수 명시) + 쿨다운
-2. 음식 사진/바코드 → 칼로리·단백질·탄수화물·지방 분석, 반드시 "총 약 XXXkcal (단백질 XXg / 탄수화물 XXg / 지방 XXg)" 형식으로 포함. 고혈압이므로 나트륨 높은 음식은 경고
+1. ⌚ 애플워치 운동 기록 → 운동 종류·시간·소모칼로리·심박수 분석 + 심박수가 목표범위(최대심박수의 60~75%)에 맞는지 평가 + 이어서 할 추천 세트(세트×횟수 명시) + 쿨다운. 소모칼로리는 반드시 "소모 칼로리: XXXkcal" 형식 포함.
+2. 🍽️ 음식 사진/바코드 → 한국 식품의약품안전처 식품영양성분DB + 농촌진흥청 식품성분표 + USDA FoodData Central 기준으로 정확한 칼로리·영양소 계산. 반드시 "총 약 XXXkcal (단백질 XXg / 탄수화물 XXg / 지방 XXg)" 형식 포함. 고혈압이므로 나트륨 높은 음식 경고. 음식명을 **굵게** 먼저 표시.
 
 💡 답변: 반말, 핵심 위주(300-400자), 격려로 마무리, 마크다운 **굵은글씨** 사용 가능`;
 }
 
-function addAI(text, saveHist = true) {
+/* addAI: 라이브 메시지 (chips 포함, 히스토리 저장, 자동기록)
+   fromImg=true면 사진 응답 → 음식/운동 자동기록 */
+function addAI(text, saveHist = true, fromImg = false) {
   const msgs = document.getElementById('chat-msgs');
-  const row = document.createElement('div');
-  row.className = 'msg-row ai';
 
-  // detect if this message has calorie/workout info → show chips
-  const cals = extractCals(text);
-  const exCals = extractExerciseCals(text);
-  const isWorkout = detectWorkout(text);
-  let chipsHtml = '';
-  if (cals) {
-    chipsHtml += `<button class="msg-chip" onclick="offerCalorie(${cals},this)">🍽️ ${cals}kcal 섭취 기록</button>`;
-  }
-  if (exCals) {
-    // 애플워치 사진이면 자동 기록
-    const workoutName = extractWorkoutName(text);
-    if (isWorkout && pendingImg === null) {
-      // 방금 이미지 분석 후라면 자동 추가
-      addExerciseEntry(workoutName, exCals);
-      showToast(`🔥 ${workoutName} ${exCals}kcal 운동 소모 자동 기록됐어!`);
-      chipsHtml += `<button class="msg-chip" style="border-color:#4caf50;color:#4caf50;opacity:.6;cursor:default">✅ ${exCals}kcal 소모 기록 완료</button>`;
-    } else {
-      chipsHtml += `<button class="msg-chip" style="border-color:#4caf50;color:#4caf50" onclick="offerExercise(${exCals},this)">🔥 ${exCals}kcal 소모 기록</button>`;
+  // 날짜 구분선: 오늘 날짜가 이전 메시지와 다를 경우
+  ensureDateSep(msgs);
+
+  const cals     = extractCals(text);
+  const exCals   = extractExerciseCals(text);
+  const isWorkout= detectWorkout(text);
+
+  // ── 자동 기록 (사진 첨부 응답일 때만) ──
+  if (fromImg) {
+    const h = new Date().getHours();
+    const mt = h < 10 ? 'breakfast' : h < 14 ? 'lunch' : h < 20 ? 'dinner' : 'snack';
+    if (exCals && isWorkout) {
+      // 애플워치 운동 → 자동 운동 기록
+      const wName = extractWorkoutName(text);
+      addExerciseEntry(wName, exCals);
+      markToday();
+      setTimeout(() => showToast(`✅ ${wName} ${exCals}kcal 소모 자동 기록됐어! 캘린더도 체크됨 📅`), 600);
+    } else if (cals && !isWorkout) {
+      // 음식 사진 → 자동 칼로리 기록
+      const fName = extractFoodName(text);
+      const macros = extractMacros(text);
+      addMealEntry(fName, cals, macros.protein, macros.carb, macros.fat, mt);
+      setTimeout(() => showToast(`✅ ${fName} ${cals}kcal 자동 기록됐어! 🍽️`), 600);
     }
   }
+
+  // ── 버블 렌더링 ──
+  addAIBubble(text, true);
+
+  // ── 액션 칩 ──
+  let chipsHtml = '';
+  if (cals && !fromImg) {
+    chipsHtml += `<button class="msg-chip" onclick="offerCalorie(${cals},this)">🍽️ ${cals}kcal 섭취 기록</button>`;
+  } else if (cals && fromImg && !isWorkout) {
+    chipsHtml += `<button class="msg-chip" style="opacity:.55;cursor:default">✅ 칼로리 자동 기록 완료</button>`;
+  }
+  if (exCals && !fromImg) {
+    chipsHtml += `<button class="msg-chip" style="border-color:#4caf50;color:#4caf50" onclick="offerExercise(${exCals},this)">🔥 ${exCals}kcal 소모 기록</button>`;
+  } else if (exCals && fromImg && isWorkout) {
+    chipsHtml += `<button class="msg-chip" style="border-color:#4caf50;color:#4caf50;opacity:.55;cursor:default">✅ 운동 자동 기록 완료</button>`;
+  }
   if (isWorkout || exCals) {
-    chipsHtml += `<button class="msg-chip" onclick="markTodayFromChat(this)">📅 오늘 운동 완료 기록</button>`;
+    chipsHtml += `<button class="msg-chip" onclick="markTodayFromChat(this)">📅 운동 완료 기록</button>`;
   }
   chipsHtml += `<button class="msg-chip" onclick="promptSaveRoutine(this)">📌 루틴 저장</button>`;
 
+  const chips = document.createElement('div');
+  chips.className = 'msg-chips';
+  chips.innerHTML = chipsHtml;
+  document.getElementById('chat-msgs').appendChild(chips);
+
+  if (saveHist) {
+    history.push({ role: 'assistant', text, date: todayStr(), time: nowTime() });
+    saveHistory();
+  }
+  scrollBottom();
+}
+
+/* 히스토리 렌더링용 (chips 없음) */
+function addAIBubble(text, storeDataset = true) {
+  const msgs = document.getElementById('chat-msgs');
+  const row  = document.createElement('div');
+  row.className = 'msg-row ai';
   row.innerHTML = `
     <div class="msg-av">🏋️</div>
     <div class="msg-body">
@@ -1006,34 +1076,41 @@ function addAI(text, saveHist = true) {
       <div class="bubble">${renderMd(text)}</div>
       <div class="msg-meta">${nowTime()}</div>
     </div>`;
-  // store the text for routine saving
-  row.dataset.text = text;
+  if (storeDataset) row.dataset.text = text;
   msgs.appendChild(row);
-
-  if (chipsHtml) {
-    const chips = document.createElement('div');
-    chips.className = 'msg-chips';
-    chips.innerHTML = chipsHtml;
-    msgs.appendChild(chips);
-  }
-
-  if (saveHist) {
-    history.push({ role: 'assistant', text });
-    saveHistory();
-  }
-  scrollBottom();
 }
 
 function addUser(text, imgSrc) {
+  ensureDateSep(document.getElementById('chat-msgs'));
+  addUserBubble(text, imgSrc, true);
+}
+
+function addUserBubble(text, imgSrc, saveHist = true) {
   const msgs = document.getElementById('chat-msgs');
   let inner = '';
-  if (imgSrc) inner += `<img src="${imgSrc}" alt="첨부 사진" loading="lazy">`;
+  if (imgSrc) inner += `<img src="${imgSrc}" alt="첨부 사진" loading="lazy" style="max-width:200px;border-radius:10px;display:block">`;
   if (text)   inner += (imgSrc ? '<br>' : '') + esc(text);
   const row = document.createElement('div');
   row.className = 'msg-row user';
   row.innerHTML = `<div class="msg-body"><div class="bubble">${inner}</div><div class="msg-meta">${nowTime()}</div></div>`;
-  document.getElementById('chat-msgs').appendChild(row);
-  scrollBottom();
+  msgs.appendChild(row);
+  if (saveHist) scrollBottom();
+}
+
+/* 날짜 구분선: 마지막 구분선 날짜 ≠ 오늘이면 추가 */
+let _lastSepDate = '';
+function ensureDateSep(msgs) {
+  if (_lastSepDate === todayStr()) return;
+  // 이미 오늘 날짜 sep이 있는지 확인
+  const seps = msgs.querySelectorAll('.date-sep span');
+  for (const s of seps) {
+    if (s.textContent === '오늘') return;
+  }
+  const sep = document.createElement('div');
+  sep.className = 'date-sep';
+  sep.innerHTML = `<span>오늘</span>`;
+  msgs.appendChild(sep);
+  _lastSepDate = todayStr();
 }
 
 function renderMd(t) {
@@ -1066,10 +1143,13 @@ async function sendMsg() {
   const img  = pendingImg;
   if (!text && !img) return;
 
-  addUser(text, img ? `data:${img.mime};base64,${img.data}` : null);
+  const hadImage = !!img; // 사진 첨부 여부 추적
+  const imgSrc = img ? `data:${img.mime};base64,${img.data}` : null;
+  addUser(text, imgSrc);
   inputEl.value = ''; autoGrow(inputEl); clearImage();
 
-  history.push({ role: 'user', text: text || '[사진 첨부]' });
+  history.push({ role: 'user', text: text || '[사진 첨부]', date: todayStr(), time: nowTime(),
+    imgSrc: imgSrc ? imgSrc.substring(0, 80) + '…' : undefined }); // 히스토리에 썸네일 힌트 저장
 
   setTyping(true); setStatus('답변 작성 중... ✍️');
 
@@ -1082,7 +1162,7 @@ async function sendMsg() {
   try {
     const reply = await callClaude(messages);
     setTyping(false); setStatus('온라인 · 항상 응답 가능');
-    addAI(reply);
+    addAI(reply, true, hadImage); // hadImage → 자동 기록 트리거
     updateCalBadge();
   } catch(err) {
     console.error(err);
@@ -1797,13 +1877,30 @@ function onFoodPhoto(e, mode) {
 }
 
 async function analyzeFoodImage(b64, mode) {
-  const key = getKey();
-  if (!key) { openKeyModal(); throw new Error('API 키 없음'); }
   const h = new Date().getHours();
   const timeHint = h < 10 ? 'breakfast' : h < 14 ? 'lunch' : h < 20 ? 'dinner' : 'snack';
+
+  // ── 바코드 모드: BarcodeDetector → Open Food Facts 먼저 시도 ──
+  if (mode === 'barcode') {
+    try {
+      const barcodeNum = await detectBarcodeLocal(b64);
+      if (barcodeNum) {
+        document.getElementById('meal-analyzing-text').textContent = `📦 바코드 ${barcodeNum} 검색 중...`;
+        const offResult = await fetchOpenFoodFacts(barcodeNum, timeHint);
+        if (offResult) return offResult;
+      }
+    } catch(e) { /* 실패 시 Claude로 폴백 */ }
+    document.getElementById('meal-analyzing-text').textContent = '🤖 AI로 바코드 분석 중...';
+  }
+
+  // ── Claude AI 분석 ──
+  const key = getKey();
+  if (!key) { openKeyModal(); throw new Error('API 키 없음'); }
+
+  const sysMsg = `당신은 음식 영양성분 분석 전문가입니다. 한국 식품 데이터베이스(식약처 식품영양성분DB), 농촌진흥청 식품영양성분표, 미국 USDA FoodData Central 등의 공인 데이터를 기반으로 정확한 칼로리/영양소를 제공합니다. 반드시 JSON 형식으로만 응답하세요.`;
   const prompt = mode === 'barcode'
-    ? `이 바코드 이미지를 스캔해서 제품명과 영양성분을 분석해줘. 반드시 다음 JSON 형식만 응답 (다른 텍스트 금지): {"name":"제품명","cal":칼로리숫자,"protein":단백질g숫자,"carb":탄수화물g숫자,"fat":지방g숫자,"mealType":"${timeHint}"}`
-    : `이 음식 사진을 분석해줘. 음식 종류와 대략적인 양을 파악해서 칼로리/영양성분을 추정해. 반드시 다음 JSON 형식만 응답 (다른 텍스트 금지): {"name":"음식명(한국어)","cal":칼로리숫자,"protein":단백질g숫자,"carb":탄수화물g숫자,"fat":지방g숫자,"mealType":"${timeHint}"}`;
+    ? `이 바코드 이미지의 제품을 인식하고 1회 제공량 기준 영양성분을 분석해줘. 반드시 JSON만 응답: {"name":"제품명(용량/1회분량)","cal":숫자,"protein":숫자,"carb":숫자,"fat":숫자,"mealType":"${timeHint}"}`
+    : `이 음식 사진의 종류와 양을 파악해서 한국 식품영양성분DB 기준으로 정확한 칼로리/영양성분을 계산해줘. 1인분(보이는 양) 기준. 반드시 JSON만 응답: {"name":"음식명(한국어,양 명시)","cal":숫자,"protein":숫자,"carb":숫자,"fat":숫자,"mealType":"${timeHint}"}`;
 
   const res = await fetch(CLAUDE_URL, {
     method: 'POST',
@@ -1814,22 +1911,52 @@ async function analyzeFoodImage(b64, mode) {
       'anthropic-dangerous-direct-browser-access': 'true'
     },
     body: JSON.stringify({
-      model: MODEL,
-      max_tokens: 300,
-      system: '음식/바코드 분석 전문가. JSON 형식으로만 응답.',
+      model: MODEL, max_tokens: 350, system: sysMsg,
       messages: [{ role: 'user', content: [
         { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: b64 } },
-        { type: 'text',  text: prompt }
+        { type: 'text', text: prompt }
       ]}]
     })
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error?.message || '분석 오류');
-  const text = data.content?.[0]?.text || '';
-  // JSON 파싱 시도
-  const match = text.match(/\{[\s\S]*\}/);
-  if (!match) throw new Error('JSON 파싱 실패');
+  const txt = data.content?.[0]?.text || '';
+  const match = txt.match(/\{[\s\S]*?\}/);
+  if (!match) throw new Error('JSON 파싱 실패: ' + txt.slice(0,100));
   return JSON.parse(match[0]);
+}
+
+async function detectBarcodeLocal(b64) {
+  if (!('BarcodeDetector' in window)) return null;
+  try {
+    const img = new Image();
+    img.src = `data:image/jpeg;base64,${b64}`;
+    await new Promise((res, rej) => { img.onload = res; img.onerror = rej; });
+    const detector = new BarcodeDetector({
+      formats: ['ean_13','ean_8','qr_code','code_128','code_39','upc_a','upc_e','itf']
+    });
+    const codes = await detector.detect(img);
+    return codes.length > 0 ? codes[0].rawValue : null;
+  } catch(e) { return null; }
+}
+
+async function fetchOpenFoodFacts(barcode, timeHint) {
+  const url = `https://world.openfoodfacts.org/api/v2/product/${barcode}.json?fields=product_name_ko,product_name,brands,nutriments,serving_size,serving_quantity`;
+  const res  = await fetch(url, { signal: AbortSignal.timeout(6000) });
+  const data = await res.json();
+  if (data.status !== 1 || !data.product) return null;
+  const p = data.product;
+  const n = p.nutriments || {};
+  // 1회 제공량 우선, 없으면 100g 기준
+  const hasSrv = n['energy-kcal_serving'] != null;
+  const cal  = Math.round(hasSrv ? (n['energy-kcal_serving']||0) : (n['energy-kcal_100g']||0));
+  const prot = Math.round(hasSrv ? (n['proteins_serving']||0)       : (n['proteins_100g']||0));
+  const carb = Math.round(hasSrv ? (n['carbohydrates_serving']||0)   : (n['carbohydrates_100g']||0));
+  const fat  = Math.round(hasSrv ? (n['fat_serving']||0)             : (n['fat_100g']||0));
+  const name = (p.product_name_ko || p.product_name || '바코드 제품').slice(0, 40);
+  const srv  = hasSrv ? (p.serving_size ? ` (${p.serving_size})` : ' (1회분)') : ' (100g 기준)';
+  if (cal === 0) return null; // 데이터 없으면 Claude로 폴백
+  return { name: name + srv, cal, protein: prot, carb, fat, mealType: timeHint };
 }
 
 /* ── 간헐적 단식 (IF) ── */
@@ -2049,9 +2176,25 @@ function showToast(msg) {
    STORAGE
 ══════════════════════════════════════════════════ */
 function saveHistory() {
-  const MAX = 40;
+  const MAX = 600; // 날짜별 기록 유지 (약 1~2개월치)
   if (history.length > MAX) history = history.slice(-MAX);
   localStorage.setItem('pt_history', JSON.stringify(history));
+}
+
+function extractFoodName(text) {
+  // **굵은글씨** 중 칼로리/영양소 키워드 아닌 것
+  const boldMatches = [...text.matchAll(/\*\*([^*\n]{1,25})\*\*/g)];
+  for (const m of boldMatches) {
+    const n = m[1].trim();
+    if (!/kcal|칼로리|단백|탄수|지방|분석|결과|총|약/i.test(n) && n.length > 1) return n;
+  }
+  // "이 음식은 X야" 패턴
+  const m2 = text.match(/이\s+(?:음식|제품|식품|메뉴)은?\s+(.{1,20}?)(?:야|이야|이야|이에요|\()/);
+  if (m2) return m2[1].replace(/\*\*/g,'').trim();
+  // 첫 한국어 단어 그룹
+  const m3 = text.match(/^([가-힣a-zA-Z][가-힣a-zA-Z0-9·\-\s]{1,20})(?:\s*[은는이가]?\s*(?:야|이야|분석|칼로리))/m);
+  if (m3) return m3[1].trim();
+  return '음식';
 }
 
 /* ══════════════════════════════════════════════════
