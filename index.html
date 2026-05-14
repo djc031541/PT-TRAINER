@@ -998,24 +998,45 @@ function sysPrompt() {
 1. ⌚ 애플워치/운동 사진 → 운동 종류·시간·소모칼로리·심박수 분석, 심박수 목표범위(최대심박수 60~75%) 평가, 추천 세트(세트×횟수), 쿨다운 안내.
 2. 🍽️ 음식/바코드 사진 → 한국 식약처 식품영양성분DB + 농촌진흥청 + USDA 기준 칼로리·영양소 계산. 음식명 **굵게** 먼저 표시. 고혈압이므로 나트륨 높은 음식 경고.
 
-🔴 【자동기록 태그 — 절대 규칙】 이미지가 포함된 메시지에 응답할 때 반드시 응답 맨 끝에 다음 태그 중 하나를 한 줄로 추가 (형식 절대 변경 금지, 다른 텍스트 추가 금지):
-음식/음료/바코드: [RECORD:{"t":"food","name":"음식명","cal":칼로리정수,"p":단백질g정수,"k":탄수화물g정수,"f":지방g정수}]
+🔴 【자동기록 태그 — 최우선 절대 규칙】 이미지가 포함된 메시지에 응답할 때, 반드시 응답의 **첫 번째 줄**에 아래 태그 중 하나를 단독으로 출력하고, 그 다음 줄부터 분석 내용을 작성할 것. 태그 형식 절대 변경 금지.
+음식/음료/바코드: [RECORD:{"t":"food","name":"음식명(간결하게)","cal":총칼로리정수,"p":단백질g정수,"k":탄수화물g정수,"f":지방g정수}]
 운동/워치/소모: [RECORD:{"t":"ex","name":"운동명","cal":소모칼로리정수}]
 이미지 없거나 해당없음: [RECORD:{"t":"none"}]
 
-💡 답변: 반말, 핵심 위주(300-400자), 격려로 마무리, 마크다운 **굵은글씨** 사용 가능`;
+💡 답변: 반말, 핵심 위주, 격려로 마무리, 마크다운 **굵은글씨** 사용 가능`;
 }
 
 /* addAI: 라이브 메시지 (chips 포함, 히스토리 저장, 자동기록)
    fromImg=true면 [RECORD:{...}] 태그 파싱 → 칼로리/운동 자동기록 */
 function addAI(rawText, saveHist = true, fromImg = false) {
-  // ── [RECORD:{...}] 태그 파싱 (화면에는 숨김) ──
+  // ── [RECORD:{...}] 태그 파싱 (응답 첫줄 또는 어디든 존재 가능, 화면에는 숨김) ──
   let text = rawText;
   let autoRecord = null;
-  const recMatch = rawText.match(/\[RECORD:(\{.*?\})\]/);
-  if (recMatch) {
-    try { autoRecord = JSON.parse(recMatch[1]); } catch(e) {}
-    text = rawText.replace(/\[RECORD:\{.*?\}\]\s*/g, '').trimEnd();
+  // 첫 줄에 RECORD 태그가 있는지 먼저 확인 (새 방식: 첫줄에 위치)
+  const firstLine = rawText.split('\n')[0].trim();
+  const firstLineMatch = firstLine.match(/^\[RECORD:(\{.*?\})\]$/);
+  if (firstLineMatch) {
+    try { autoRecord = JSON.parse(firstLineMatch[1]); } catch(e) { console.error('RECORD parse err', e); }
+    // 첫 줄 제거 후 남은 텍스트 (앞뒤 공백 제거)
+    text = rawText.replace(/^\[RECORD:\{[^}]*\}\]\s*\n?/, '').trimStart();
+  } else {
+    // 구버전 호환: 텍스트 어딘가에 RECORD 태그가 있는 경우
+    const recMatch = rawText.match(/\[RECORD:(\{[^}]*\})\]/);
+    if (recMatch) {
+      try { autoRecord = JSON.parse(recMatch[1]); } catch(e) { console.error('RECORD parse err', e); }
+      text = rawText.replace(/\[RECORD:\{[^}]*\}\]\s*/g, '').trimEnd();
+    }
+  }
+  // fromImg인데 RECORD 태그가 없는 경우 → 응답이 잘렸거나 Claude가 무시한 경우
+  // 이때 extractCals/extractExerciseCals 폴백 사용
+  if (fromImg && !autoRecord) {
+    const fallbackCal = extractCals(rawText);
+    const fallbackExCal = extractExerciseCals(rawText);
+    if (fallbackCal > 0) {
+      autoRecord = { t: 'food', name: '식사', cal: fallbackCal, p: 0, k: 0, f: 0 };
+    } else if (fallbackExCal > 0 || detectWorkout(rawText)) {
+      autoRecord = { t: 'ex', name: '운동', cal: fallbackExCal || 0 };
+    }
   }
 
   const msgs = document.getElementById('chat-msgs');
@@ -1203,7 +1224,7 @@ async function callClaude(messages) {
       'anthropic-version': '2023-06-01',
       'anthropic-dangerous-direct-browser-access': 'true'
     },
-    body: JSON.stringify({ model: MODEL, max_tokens: 1024, system: sysPrompt(), messages })
+    body: JSON.stringify({ model: MODEL, max_tokens: 2048, system: sysPrompt(), messages })
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error?.message || `API 오류 (${res.status})`);
