@@ -339,11 +339,34 @@ body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic N
 .if-toggle-btn.start-fast{background:linear-gradient(135deg,#9c27b0,#673ab7);color:#fff}
 .if-toggle-btn.end-fast{background:linear-gradient(135deg,#ff5722,#d84315);color:#fff}
 /* ── 음식 카메라 버튼 ── */
-.food-cam-area{display:flex;gap:8px;margin:12px 14px 0}
-.food-cam-btn{flex:1;background:linear-gradient(135deg,#4caf50,#2e7d32);border:none;border-radius:14px;padding:15px 10px;color:#fff;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 4px 14px rgba(76,175,80,.3);-webkit-appearance:none}
+.food-cam-area{display:flex;gap:8px;margin:12px 14px 0;flex-wrap:wrap}
+.food-search-btn{flex:0 0 100%;background:linear-gradient(135deg,#ff6b35,#e55000);border:none;border-radius:14px;padding:15px 10px;color:#fff;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 4px 14px rgba(255,107,53,.3);-webkit-appearance:none}
+.food-search-btn:active{opacity:.85}
+.food-cam-btn{flex:1;background:linear-gradient(135deg,#4caf50,#2e7d32);border:none;border-radius:14px;padding:13px 8px;color:#fff;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;box-shadow:0 4px 14px rgba(76,175,80,.3);-webkit-appearance:none}
 .food-cam-btn:active{opacity:.85}
-.food-barcode-btn{flex:1;background:linear-gradient(135deg,#2196f3,#1565c0);border:none;border-radius:14px;padding:15px 10px;color:#fff;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 4px 14px rgba(33,150,243,.3);-webkit-appearance:none}
+.food-barcode-btn{flex:1;background:linear-gradient(135deg,#2196f3,#1565c0);border:none;border-radius:14px;padding:13px 8px;color:#fff;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;box-shadow:0 4px 14px rgba(33,150,243,.3);-webkit-appearance:none}
 .food-barcode-btn:active{opacity:.85}
+/* 음식 검색 모달 */
+.food-search-modal .modal-sheet{max-height:90vh;display:flex;flex-direction:column}
+.fs-search-wrap{position:relative;margin-bottom:10px;flex-shrink:0}
+.fs-input{width:100%;border:2px solid #eee;border-radius:14px;padding:12px 14px 12px 40px;font-size:15px;font-family:inherit;outline:none;-webkit-appearance:none;transition:border-color .2s;-webkit-user-select:text;user-select:text;background:#f8f8f8}
+.fs-input:focus{border-color:var(--primary);background:#fff}
+.fs-input-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:18px;pointer-events:none}
+.fs-loading{text-align:center;padding:20px;color:#aaa;font-size:13px;display:none}
+.fs-tabs{display:flex;gap:6px;margin-bottom:10px;flex-shrink:0;overflow-x:auto;scrollbar-width:none}
+.fs-tabs::-webkit-scrollbar{display:none}
+.fs-tab{background:#f0f0f5;border:none;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:600;color:#666;font-family:inherit;cursor:pointer;white-space:nowrap;transition:all .15s;-webkit-appearance:none;flex-shrink:0}
+.fs-tab.active{background:var(--primary);color:#fff}
+.fs-results{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:200px}
+.fs-item{display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid #f0f0f0;cursor:pointer;transition:background .15s;-webkit-tap-highlight-color:transparent}
+.fs-item:active{background:#fff5f2}
+.fs-item-icon{font-size:24px;flex-shrink:0;width:36px;text-align:center}
+.fs-item-info{flex:1;min-width:0}
+.fs-item-name{font-size:14px;font-weight:600;color:#222;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fs-item-meta{font-size:12px;color:#888;margin-top:2px}
+.fs-item-cal{font-size:15px;font-weight:800;color:var(--primary);flex-shrink:0}
+.fs-empty{text-align:center;padding:40px 20px;color:#bbb;font-size:13px}
+.fs-source-badge{font-size:10px;background:#e8f4ff;color:#2196f3;padding:2px 6px;border-radius:8px;margin-left:4px;font-weight:600}
 /* ── 식사 카테고리 탭 ── */
 .meal-cat-tabs{display:flex;gap:6px;padding:10px 14px 2px;overflow-x:auto;scrollbar-width:none}
 .meal-cat-tabs::-webkit-scrollbar{display:none}
@@ -638,13 +661,16 @@ body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic N
     </div>
     <button class="add-exercise-btn" onclick="openAddExercise()">➕ 운동 소모 직접 추가</button>
 
-    <!-- Food: photo / barcode buttons -->
+    <!-- Food: search / photo / barcode buttons -->
     <div class="food-cam-area">
+      <button class="food-search-btn" onclick="openFoodSearch()">
+        🔍 음식 검색
+      </button>
       <button class="food-cam-btn" onclick="triggerFoodPhoto()">
-        📷 음식 사진으로 추가
+        📷 사진 분석
       </button>
       <button class="food-barcode-btn" onclick="triggerBarcodePhoto()">
-        📦 바코드 스캔
+        📦 바코드
       </button>
     </div>
     <input type="file" id="food-photo-input" accept="image/*" capture="environment" style="display:none" onchange="onFoodPhoto(event,'food')">
@@ -755,6 +781,32 @@ body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic N
       </div>
     </div>
     <button class="modal-save-btn" onclick="confirmAddMeal()">추가하기</button>
+  </div>
+</div>
+
+<!-- Food Search Modal -->
+<div class="modal-bg food-search-modal" id="food-search-modal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal-sheet" style="max-height:88vh;display:flex;flex-direction:column;padding-bottom:calc(var(--safe-bottom)+16px)">
+    <div class="modal-handle"></div>
+    <div class="modal-title" style="flex-shrink:0">🔍 음식 검색</div>
+    <div class="fs-search-wrap">
+      <span class="fs-input-icon">🔍</span>
+      <input type="text" class="fs-input" id="fs-input" placeholder="음식명 검색 (예: 비빔밥, 삼겹살, 바나나...)"
+        autocomplete="off" autocorrect="off" oninput="onFoodSearch(this.value)" style="-webkit-user-select:text;user-select:text">
+    </div>
+    <div class="fs-tabs" id="fs-tabs">
+      <button class="fs-tab active" onclick="setFsTab('all',this)">전체</button>
+      <button class="fs-tab" onclick="setFsTab('rice',this)">🍚 밥류</button>
+      <button class="fs-tab" onclick="setFsTab('soup',this)">🍲 국/찌개</button>
+      <button class="fs-tab" onclick="setFsTab('meat',this)">🥩 육류</button>
+      <button class="fs-tab" onclick="setFsTab('side',this)">🥗 반찬</button>
+      <button class="fs-tab" onclick="setFsTab('noodle',this)">🍜 면류</button>
+      <button class="fs-tab" onclick="setFsTab('snack',this)">🍰 간식/빵</button>
+      <button class="fs-tab" onclick="setFsTab('fruit',this)">🍎 과일</button>
+      <button class="fs-tab" onclick="setFsTab('drink',this)">☕ 음료</button>
+    </div>
+    <div class="fs-loading" id="fs-loading">🔄 검색 중...</div>
+    <div class="fs-results" id="fs-results"></div>
   </div>
 </div>
 
@@ -2338,6 +2390,232 @@ function extractFoodName(text) {
   const m3 = text.match(/^([가-힣a-zA-Z][가-힣a-zA-Z0-9·\-\s]{1,20})(?:\s*[은는이가]?\s*(?:야|이야|분석|칼로리))/m);
   if (m3) return m3[1].trim();
   return '음식';
+}
+
+/* ══════════════════════════════════════════════════
+   FOOD SEARCH
+══════════════════════════════════════════════════ */
+// 한국 식품 내장 DB (식약처 식품영양성분DB 기준, 1인분 기준)
+const KR_FOOD_DB = [
+  // ── 밥류 ──
+  {n:'흰쌀밥',c:300,p:5,k:66,f:1,cat:'rice',icon:'🍚',unit:'1공기(210g)'},
+  {n:'잡곡밥',c:280,p:6,k:60,f:1,cat:'rice',icon:'🍚',unit:'1공기(210g)'},
+  {n:'현미밥',c:275,p:6,k:59,f:2,cat:'rice',icon:'🍚',unit:'1공기(210g)'},
+  {n:'비빔밥',c:570,p:18,k:85,f:16,cat:'rice',icon:'🍚',unit:'1인분(500g)'},
+  {n:'볶음밥',c:450,p:12,k:70,f:14,cat:'rice',icon:'🍚',unit:'1인분(350g)'},
+  {n:'김밥',c:320,p:9,k:52,f:8,cat:'rice',icon:'🍱',unit:'1줄(250g)'},
+  {n:'삼각김밥',c:180,p:5,k:30,f:4,cat:'rice',icon:'🍙',unit:'1개(110g)'},
+  {n:'초밥(8개)',c:380,p:18,k:60,f:6,cat:'rice',icon:'🍣',unit:'8개(280g)'},
+  {n:'오므라이스',c:480,p:14,k:68,f:16,cat:'rice',icon:'🍳',unit:'1인분(350g)'},
+  {n:'카레라이스',c:520,p:14,k:80,f:14,cat:'rice',icon:'🍛',unit:'1인분(400g)'},
+  {n:'덮밥(불고기)',c:540,p:22,k:72,f:16,cat:'rice',icon:'🍚',unit:'1인분(400g)'},
+  // ── 국/찌개 ──
+  {n:'된장찌개',c:80,p:6,k:6,f:3,cat:'soup',icon:'🍲',unit:'1인분(300ml)'},
+  {n:'김치찌개',c:120,p:8,k:8,f:5,cat:'soup',icon:'🍲',unit:'1인분(300ml)'},
+  {n:'순두부찌개',c:150,p:10,k:8,f:7,cat:'soup',icon:'🍲',unit:'1인분(350ml)'},
+  {n:'부대찌개',c:380,p:22,k:28,f:18,cat:'soup',icon:'🍲',unit:'1인분(400ml)'},
+  {n:'미역국',c:50,p:4,k:3,f:2,cat:'soup',icon:'🍵',unit:'1인분(250ml)'},
+  {n:'콩나물국',c:35,p:3,k:4,f:1,cat:'soup',icon:'🍵',unit:'1인분(250ml)'},
+  {n:'설렁탕',c:280,p:24,k:12,f:14,cat:'soup',icon:'🍲',unit:'1인분(500ml)'},
+  {n:'갈비탕',c:320,p:28,k:8,f:18,cat:'soup',icon:'🍲',unit:'1인분(500ml)'},
+  {n:'삼계탕',c:430,p:38,k:18,f:22,cat:'soup',icon:'🍲',unit:'1인분(700g)'},
+  {n:'순대국밥',c:520,p:28,k:55,f:18,cat:'soup',icon:'🍲',unit:'1인분(600ml+밥)'},
+  // ── 육류/단백질 ──
+  {n:'삼겹살구이',c:520,p:22,k:0,f:46,cat:'meat',icon:'🥩',unit:'150g'},
+  {n:'불고기',c:260,p:20,k:14,f:12,cat:'meat',icon:'🥩',unit:'150g'},
+  {n:'제육볶음',c:300,p:20,k:12,f:18,cat:'meat',icon:'🥩',unit:'150g'},
+  {n:'닭가슴살',c:165,p:31,k:0,f:4,cat:'meat',icon:'🍗',unit:'100g'},
+  {n:'닭다리살',c:210,p:24,k:0,f:12,cat:'meat',icon:'🍗',unit:'100g'},
+  {n:'치킨(프라이드)',c:350,p:22,k:18,f:22,cat:'meat',icon:'🍗',unit:'1조각(150g)'},
+  {n:'소갈비',c:380,p:26,k:0,f:30,cat:'meat',icon:'🥩',unit:'150g'},
+  {n:'돼지고기(앞다리)',c:200,p:22,k:0,f:12,cat:'meat',icon:'🥩',unit:'100g'},
+  {n:'스팸(1캔)',c:300,p:12,k:4,f:26,cat:'meat',icon:'🥫',unit:'100g'},
+  {n:'계란(1개)',c:75,p:6,k:0,f:5,cat:'meat',icon:'🥚',unit:'1개(60g)'},
+  {n:'계란후라이',c:90,p:6,k:0,f:7,cat:'meat',icon:'🍳',unit:'1개'},
+  {n:'두부(부침)',c:150,p:10,k:4,f:9,cat:'meat',icon:'⬜',unit:'반모(150g)'},
+  // ── 반찬/사이드 ──
+  {n:'김치',c:25,p:1,k:4,f:0,cat:'side',icon:'🥬',unit:'1접시(60g)'},
+  {n:'깍두기',c:20,p:1,k:4,f:0,cat:'side',icon:'🥬',unit:'1접시(60g)'},
+  {n:'시금치나물',c:30,p:2,k:4,f:1,cat:'side',icon:'🥬',unit:'1접시(60g)'},
+  {n:'콩나물무침',c:25,p:2,k:3,f:1,cat:'side',icon:'🫘',unit:'1접시(60g)'},
+  {n:'잡채',c:190,p:4,k:28,f:7,cat:'side',icon:'🍜',unit:'1접시(120g)'},
+  {n:'콩조림',c:100,p:6,k:14,f:2,cat:'side',icon:'🫘',unit:'1접시(60g)'},
+  {n:'멸치볶음',c:120,p:14,k:8,f:3,cat:'side',icon:'🐟',unit:'1접시(60g)'},
+  {n:'계란말이',c:130,p:8,k:2,f:10,cat:'side',icon:'🥚',unit:'1줄(80g)'},
+  {n:'감자조림',c:110,p:2,k:22,f:2,cat:'side',icon:'🥔',unit:'1접시(100g)'},
+  {n:'호박전',c:140,p:5,k:16,f:6,cat:'side',icon:'🫛',unit:'1접시(100g)'},
+  {n:'샐러드(채소)',c:30,p:2,k:6,f:0,cat:'side',icon:'🥗',unit:'1접시(100g)'},
+  {n:'샐러드(닭가슴살)',c:180,p:24,k:8,f:5,cat:'side',icon:'🥗',unit:'1접시(200g)'},
+  // ── 면류 ──
+  {n:'라면(신라면)',c:500,p:10,k:80,f:16,cat:'noodle',icon:'🍜',unit:'1봉(120g)'},
+  {n:'짜파게티',c:560,p:11,k:86,f:18,cat:'noodle',icon:'🍜',unit:'1봉(140g)'},
+  {n:'짜장면',c:620,p:18,k:100,f:14,cat:'noodle',icon:'🍜',unit:'1인분(500g)'},
+  {n:'짬뽕',c:500,p:22,k:72,f:12,cat:'noodle',icon:'🍜',unit:'1인분(600ml)'},
+  {n:'냉면(물냉면)',c:420,p:10,k:80,f:4,cat:'noodle',icon:'🍜',unit:'1인분(400g)'},
+  {n:'비빔냉면',c:480,p:10,k:88,f:8,cat:'noodle',icon:'🍜',unit:'1인분(380g)'},
+  {n:'칼국수',c:380,p:10,k:72,f:4,cat:'noodle',icon:'🍜',unit:'1인분(500ml)'},
+  {n:'우동',c:350,p:10,k:68,f:3,cat:'noodle',icon:'🍜',unit:'1인분(500ml)'},
+  {n:'파스타(크림)',c:620,p:16,k:75,f:28,cat:'noodle',icon:'🍝',unit:'1인분(350g)'},
+  {n:'파스타(토마토)',c:450,p:14,k:72,f:12,cat:'noodle',icon:'🍝',unit:'1인분(350g)'},
+  {n:'떡볶이',c:380,p:8,k:74,f:5,cat:'noodle',icon:'🍢',unit:'1인분(250g)'},
+  // ── 빵/간식 ──
+  {n:'식빵(1장)',c:80,p:3,k:14,f:1,cat:'snack',icon:'🍞',unit:'1장(35g)'},
+  {n:'크로아상',c:230,p:5,k:25,f:13,cat:'snack',icon:'🥐',unit:'1개(65g)'},
+  {n:'베이글',c:260,p:9,k:51,f:2,cat:'snack',icon:'🥯',unit:'1개(100g)'},
+  {n:'도넛(글레이즈)',c:250,p:4,k:36,f:11,cat:'snack',icon:'🍩',unit:'1개(75g)'},
+  {n:'케이크(조각)',c:280,p:4,k:38,f:13,cat:'snack',icon:'🎂',unit:'1조각(100g)'},
+  {n:'초코파이',c:155,p:2,k:25,f:5,cat:'snack',icon:'🍫',unit:'1개(39g)'},
+  {n:'새우깡',c:130,p:2,k:19,f:5,cat:'snack',icon:'🍿',unit:'1봉(70g)'},
+  {n:'포테이토칩',c:180,p:2,k:20,f:10,cat:'snack',icon:'🥔',unit:'1봉(55g)'},
+  {n:'아이스크림(바)',c:150,p:2,k:20,f:7,cat:'snack',icon:'🍦',unit:'1개(70ml)'},
+  {n:'그리스요거트',c:100,p:10,k:6,f:3,cat:'snack',icon:'🥛',unit:'1개(100g)'},
+  {n:'단백질바',c:200,p:20,k:22,f:6,cat:'snack',icon:'🍫',unit:'1개(55g)'},
+  // ── 패스트푸드 ──
+  {n:'햄버거(빅맥)',c:540,p:26,k:46,f:28,cat:'snack',icon:'🍔',unit:'1개'},
+  {n:'피자(1조각)',c:280,p:12,k:36,f:10,cat:'snack',icon:'🍕',unit:'1조각(120g)'},
+  {n:'핫도그',c:290,p:10,k:30,f:14,cat:'snack',icon:'🌭',unit:'1개'},
+  {n:'감자튀김(M)',c:340,p:4,k:44,f:16,cat:'snack',icon:'🍟',unit:'M사이즈'},
+  // ── 과일 ──
+  {n:'사과(중간)',c:80,p:0,k:21,f:0,cat:'fruit',icon:'🍎',unit:'1개(200g)'},
+  {n:'바나나',c:100,p:1,k:26,f:0,cat:'fruit',icon:'🍌',unit:'1개(120g)'},
+  {n:'오렌지',c:60,p:1,k:15,f:0,cat:'fruit',icon:'🍊',unit:'1개(150g)'},
+  {n:'포도(1송이)',c:90,p:1,k:23,f:0,cat:'fruit',icon:'🍇',unit:'1송이(150g)'},
+  {n:'딸기(10개)',c:50,p:1,k:12,f:0,cat:'fruit',icon:'🍓',unit:'10개(150g)'},
+  {n:'수박(1조각)',c:50,p:1,k:13,f:0,cat:'fruit',icon:'🍉',unit:'1조각(200g)'},
+  {n:'복숭아',c:55,p:1,k:13,f:0,cat:'fruit',icon:'🍑',unit:'1개(150g)'},
+  {n:'키위',c:60,p:1,k:14,f:1,cat:'fruit',icon:'🥝',unit:'1개(100g)'},
+  {n:'블루베리(1컵)',c:85,p:1,k:21,f:0,cat:'fruit',icon:'🫐',unit:'1컵(150g)'},
+  {n:'망고(1개)',c:110,p:1,k:28,f:0,cat:'fruit',icon:'🥭',unit:'1개(200g)'},
+  // ── 음료 ──
+  {n:'아메리카노',c:5,p:0,k:1,f:0,cat:'drink',icon:'☕',unit:'1잔(355ml)'},
+  {n:'카페라떼',c:120,p:6,k:12,f:5,cat:'drink',icon:'☕',unit:'1잔(355ml)'},
+  {n:'카푸치노',c:100,p:5,k:10,f:4,cat:'drink',icon:'☕',unit:'1잔(355ml)'},
+  {n:'카페모카',c:290,p:8,k:38,f:12,cat:'drink',icon:'☕',unit:'1잔(355ml)'},
+  {n:'초코라떼',c:300,p:8,k:45,f:10,cat:'drink',icon:'🍫',unit:'1잔(355ml)'},
+  {n:'오렌지주스',c:110,p:1,k:26,f:0,cat:'drink',icon:'🍊',unit:'1컵(240ml)'},
+  {n:'콜라(캔)',c:140,p:0,k:39,f:0,cat:'drink',icon:'🥤',unit:'1캔(355ml)'},
+  {n:'맥주(캔)',c:150,p:1,k:13,f:0,cat:'drink',icon:'🍺',unit:'1캔(355ml)'},
+  {n:'소주(1병)',c:400,p:0,k:0,f:0,cat:'drink',icon:'🍶',unit:'1병(360ml)'},
+  {n:'두유(무가당)',c:80,p:6,k:6,f:4,cat:'drink',icon:'🥛',unit:'1팩(190ml)'},
+  {n:'단백질쉐이크',c:130,p:25,k:6,f:2,cat:'drink',icon:'🥤',unit:'1스쿱+물 300ml'},
+  {n:'이온음료(포카리)',c:45,p:0,k:11,f:0,cat:'drink',icon:'🥤',unit:'1캔(240ml)'},
+];
+
+const FOOD_ICONS = {
+  rice:'🍚', soup:'🍲', meat:'🥩', side:'🥗', noodle:'🍜', snack:'🍰', fruit:'🍎', drink:'☕'
+};
+
+let fsCurTab = 'all';
+let fsDebounceTimer = null;
+
+function openFoodSearch() {
+  document.getElementById('food-search-modal').classList.add('open');
+  const inp = document.getElementById('fs-input');
+  inp.value = '';
+  fsCurTab = 'all';
+  document.querySelectorAll('.fs-tab').forEach(b => b.classList.remove('active'));
+  document.querySelector('.fs-tab').classList.add('active');
+  renderFsResults('');
+  setTimeout(() => inp.focus(), 350);
+}
+
+function setFsTab(tab, btn) {
+  fsCurTab = tab;
+  document.querySelectorAll('.fs-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderFsResults(document.getElementById('fs-input').value.trim());
+}
+
+function onFoodSearch(q) {
+  clearTimeout(fsDebounceTimer);
+  const trimmed = q.trim();
+  // 로컬 DB는 즉시 표시
+  renderFsResults(trimmed);
+  // Open Food Facts API 검색 (2글자 이상, 한글이 아닌 경우도 지원)
+  if (trimmed.length >= 2) {
+    fsDebounceTimer = setTimeout(() => searchOpenFoodFacts(trimmed), 700);
+  }
+}
+
+// 로컬 DB 검색 + 렌더링
+function renderFsResults(q) {
+  const el = document.getElementById('fs-results');
+  let items = KR_FOOD_DB;
+  if (fsCurTab !== 'all') items = items.filter(f => f.cat === fsCurTab);
+  if (q) {
+    const lq = q.toLowerCase();
+    items = items.filter(f => f.n.toLowerCase().includes(lq));
+  }
+  if (items.length === 0 && !q) {
+    el.innerHTML = `<div class="fs-empty">검색어를 입력하거나 탭을 선택해봐! 🔍</div>`;
+    return;
+  }
+  if (items.length === 0) {
+    el.innerHTML = `<div class="fs-empty">검색 결과가 없어 😅<br>다른 키워드로 검색하거나 직접 입력해봐!</div>`;
+    return;
+  }
+  el.innerHTML = items.slice(0, 50).map(f => foodItemHtml(f, 'local')).join('');
+}
+
+// Open Food Facts API 검색 (비동기)
+async function searchOpenFoodFacts(q) {
+  const loading = document.getElementById('fs-loading');
+  try {
+    loading.style.display = 'block';
+    // 한국 제품 우선 검색
+    const url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(q)}&search_simple=1&action=process&json=1&page_size=20&lc=ko&countries_tags_en=south-korea`;
+    const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
+    const data = await res.json();
+    const products = (data.products || []).filter(p =>
+      p.product_name_ko || p.product_name
+    ).slice(0, 12);
+    if (products.length > 0) {
+      const offItems = products.map(p => {
+        const name = (p.product_name_ko || p.product_name || '').slice(0, 30);
+        const n100 = p.nutriments || {};
+        // 1인분 기준 (serving_size 있으면 사용, 없으면 100g)
+        const srv = parseFloat(p.serving_size) || 100;
+        const factor = srv / 100;
+        const cal = Math.round((n100['energy-kcal_100g'] || n100['energy-kcal'] || 0) * factor);
+        const prot = Math.round((n100['proteins_100g'] || 0) * factor);
+        const carb = Math.round((n100['carbohydrates_100g'] || 0) * factor);
+        const fat  = Math.round((n100['fat_100g'] || 0) * factor);
+        if (!name || cal <= 0) return null;
+        return { n: name, c: cal, p: prot, k: carb, f: fat, cat: 'off', icon: '🏪', unit: p.serving_size || '1인분' };
+      }).filter(Boolean);
+
+      if (offItems.length > 0) {
+        const el = document.getElementById('fs-results');
+        const existing = el.innerHTML;
+        const offHtml = `<div style="padding:8px 14px 4px;font-size:11px;color:#2196f3;font-weight:700">🌐 Open Food Facts 검색 결과</div>` +
+          offItems.map(f => foodItemHtml(f, 'off')).join('');
+        el.innerHTML = existing + offHtml;
+      }
+    }
+  } catch(e) { /* 네트워크 오류 무시 */ }
+  finally { loading.style.display = 'none'; }
+}
+
+function foodItemHtml(f, source) {
+  const badge = source === 'off' ? `<span class="fs-source-badge">외부DB</span>` : '';
+  return `<div class="fs-item" onclick='addFoodFromSearch(${JSON.stringify(f)})'>
+    <div class="fs-item-icon">${f.icon}</div>
+    <div class="fs-item-info">
+      <div class="fs-item-name">${esc2(f.n)}${badge}</div>
+      <div class="fs-item-meta">단백질 ${f.p}g · 탄수화물 ${f.k}g · 지방 ${f.f}g &nbsp;|&nbsp; ${f.unit||''}</div>
+    </div>
+    <div class="fs-item-cal">${f.c}<small style="font-size:10px;font-weight:500">kcal</small></div>
+  </div>`;
+}
+
+function addFoodFromSearch(food) {
+  document.getElementById('food-search-modal').classList.remove('open');
+  const h = new Date().getHours();
+  const mt = h < 10 ? 'breakfast' : h < 14 ? 'lunch' : h < 20 ? 'dinner' : 'snack';
+  addMealEntry(food.n, food.c, food.p, food.k, food.f, mt);
+  renderCalories();
+  showToast(`🍽️ ${food.n} ${food.c}kcal 기록됐어!`);
+  updateCalBadge();
 }
 
 /* ══════════════════════════════════════════════════
