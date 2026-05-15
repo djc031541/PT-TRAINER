@@ -346,6 +346,66 @@ body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic N
 .food-cam-btn:active{opacity:.85}
 .food-barcode-btn{flex:1;background:linear-gradient(135deg,#2196f3,#1565c0);border:none;border-radius:14px;padding:13px 8px;color:#fff;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;box-shadow:0 4px 14px rgba(33,150,243,.3);-webkit-appearance:none}
 .food-barcode-btn:active{opacity:.85}
+/* ══ 실시간 바코드 스캐너 ══ */
+.bc-modal{background:#000!important;align-items:stretch!important}
+.bc-modal .modal-sheet{background:transparent;border-radius:0;padding:0;max-height:100%;height:100%;display:flex;flex-direction:column;overflow:hidden}
+.bc-wrap{position:relative;flex:1;overflow:hidden}
+#bc-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.bc-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+.bc-dim-top,.bc-dim-bot{width:100%;background:rgba(0,0,0,.55);flex:1;min-height:80px}
+.bc-dim-mid{display:flex;width:100%;align-items:stretch}
+.bc-dim-side{width:40px;background:rgba(0,0,0,.55);flex-shrink:0}
+.bc-vf{width:calc(100% - 80px);max-width:280px;aspect-ratio:1.6;position:relative;flex-shrink:0}
+/* 코너 브라켓 */
+.bc-vf::before,.bc-vf::after,
+.bc-vf .bc-corner-rb,.bc-vf .bc-corner-lb{
+  content:'';position:absolute;width:28px;height:28px;border-color:#fff;border-style:solid;border-width:0
+}
+.bc-vf::before{top:0;left:0;border-top-width:3px;border-left-width:3px;border-radius:4px 0 0 0}
+.bc-vf::after{top:0;right:0;border-top-width:3px;border-right-width:3px;border-radius:0 4px 0 0}
+.bc-vf .bc-corner-rb{bottom:0;right:0;border-bottom-width:3px;border-right-width:3px;border-radius:0 0 4px 0}
+.bc-vf .bc-corner-lb{bottom:0;left:0;border-bottom-width:3px;border-left-width:3px;border-radius:0 0 0 4px}
+/* 스캔 라인 */
+.bc-scanline{position:absolute;left:4px;right:4px;height:2px;background:linear-gradient(90deg,transparent,#ff6b35,#ff3b30,#ff6b35,transparent);border-radius:2px;box-shadow:0 0 8px #ff3b30;animation:bcScan 2s ease-in-out infinite;top:0}
+@keyframes bcScan{0%,100%{top:4px;opacity:.6}50%{top:calc(100% - 6px);opacity:1}}
+/* 안내 텍스트 */
+.bc-hint-wrap{padding:14px 20px 6px;text-align:center;pointer-events:none}
+.bc-hint{color:rgba(255,255,255,.9);font-size:14px;font-weight:600;text-shadow:0 1px 4px rgba(0,0,0,.6);text-align:center}
+.bc-hint-sub{color:rgba(255,255,255,.55);font-size:12px;margin-top:4px}
+/* 상단 닫기+토치 */
+.bc-top-bar{position:absolute;top:calc(var(--safe-top)+8px);left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:0 16px;z-index:10}
+.bc-top-btn{width:42px;height:42px;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.2);border-radius:50%;color:#fff;font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-appearance:none;backdrop-filter:blur(4px)}
+.bc-top-title{color:#fff;font-size:16px;font-weight:700;text-shadow:0 1px 4px rgba(0,0,0,.5)}
+/* 결과 패널 */
+.bc-result-panel{position:absolute;bottom:0;left:0;right:0;background:#fff;border-radius:24px 24px 0 0;padding:20px 20px calc(var(--safe-bottom)+20px);transform:translateY(100%);transition:transform .35s cubic-bezier(.32,.72,0,1);z-index:20;max-height:65vh;overflow-y:auto}
+.bc-result-panel.show{transform:translateY(0)}
+.bc-rp-handle{width:38px;height:4px;background:#ddd;border-radius:2px;margin:0 auto 16px}
+.bc-rp-status{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.bc-status-icon{font-size:26px;flex-shrink:0}
+.bc-status-title{font-size:16px;font-weight:800;color:#111;flex:1}
+.bc-status-sub{font-size:12px;color:#aaa;margin-top:2px}
+.bc-nutrition-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;background:#f8f8f8;border-radius:16px;padding:14px;margin-bottom:16px}
+.bc-nut-item{text-align:center}
+.bc-nut-val{font-size:18px;font-weight:800;line-height:1}
+.bc-nut-label{font-size:10px;color:#aaa;margin-top:3px}
+.bc-nut-item.cal .bc-nut-val{color:var(--primary)}
+.bc-nut-item.p .bc-nut-val{color:#4caf50}
+.bc-nut-item.k .bc-nut-val{color:#ff9800}
+.bc-nut-item.f .bc-nut-val{color:#f44336}
+/* 편집 필드 */
+.bc-edit-row{display:flex;gap:8px;margin-bottom:12px}
+.bc-edit-input{flex:1;background:#f5f5f5;border:1.5px solid #eee;border-radius:12px;padding:11px 13px;font-size:14px;font-family:inherit;color:#222;outline:none;-webkit-appearance:none;-webkit-user-select:text;user-select:text;caret-color:var(--primary)}
+.bc-edit-input:focus{border-color:var(--primary)}
+.bc-edit-label{font-size:11px;color:#aaa;margin-bottom:5px;font-weight:600}
+.bc-meal-row{display:flex;gap:6px;margin-bottom:16px}
+.bc-mt-btn{flex:1;border:1.5px solid #eee;border-radius:10px;padding:8px 2px;font-size:11px;font-weight:600;font-family:inherit;color:#bbb;cursor:pointer;text-align:center;background:#fff;-webkit-appearance:none;transition:all .15s}
+.bc-mt-btn.sel{border-color:var(--primary);color:var(--primary);background:#fff8f5}
+.bc-btn-row{display:flex;gap:8px}
+.bc-rescan-btn{flex:1;background:#f0f0f5;border:none;border-radius:14px;padding:15px;font-size:14px;font-weight:700;font-family:inherit;color:#555;cursor:pointer;-webkit-appearance:none}
+.bc-save-btn{flex:2;background:linear-gradient(135deg,var(--primary),var(--primary-light));border:none;border-radius:14px;padding:15px;font-size:15px;font-weight:800;font-family:inherit;color:#fff;cursor:pointer;-webkit-appearance:none;box-shadow:0 6px 20px rgba(255,107,53,.35)}
+.bc-loading-dots{display:flex;gap:6px;justify-content:center;padding:20px}
+.bc-ld{width:10px;height:10px;background:var(--primary);border-radius:50%;animation:bounce 1.2s ease-in-out infinite}
+.bc-ld:nth-child(2){animation-delay:.2s}.bc-ld:nth-child(3){animation-delay:.4s}
 /* ══ 음식 검색 — 전체화면 모달 ══ */
 .food-search-modal{align-items:stretch!important}
 .food-search-modal .modal-sheet{
@@ -714,12 +774,12 @@ body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic N
       <button class="food-cam-btn" onclick="triggerFoodPhoto()">
         📷 사진 분석
       </button>
-      <button class="food-barcode-btn" onclick="triggerBarcodePhoto()">
-        📦 바코드
+      <button class="food-barcode-btn" onclick="openBarcodeScanner()">
+        📦 바코드 스캔
       </button>
     </div>
     <input type="file" id="food-photo-input" accept="image/*" capture="environment" style="display:none" onchange="onFoodPhoto(event,'food')">
-    <input type="file" id="barcode-photo-input" accept="image/*" capture="environment" style="display:none" onchange="onFoodPhoto(event,'barcode')">
+    <input type="file" id="barcode-photo-fallback" accept="image/*" capture="environment" style="display:none" onchange="onFoodPhoto(event,'barcode')">
 
     <!-- Meal category tabs -->
     <div class="meal-cat-tabs">
@@ -892,6 +952,49 @@ body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic N
       <button class="fs-mt-btn" data-mt="snack" onclick="selFsMt(this)">🍎<br>간식</button>
     </div>
     <button class="fs-confirm-btn" onclick="confirmServingAdd()">✅ 기록하기</button>
+  </div>
+</div>
+
+<!-- 실시간 바코드 스캐너 모달 -->
+<div class="modal-bg bc-modal" id="bc-modal">
+  <div class="modal-sheet">
+    <div class="bc-wrap">
+      <video id="bc-video" autoplay playsinline muted webkit-playsinline></video>
+
+      <!-- 뷰파인더 오버레이 -->
+      <div class="bc-overlay">
+        <div class="bc-dim-top"></div>
+        <div class="bc-dim-mid">
+          <div class="bc-dim-side"></div>
+          <div class="bc-vf">
+            <div class="bc-corner-rb"></div>
+            <div class="bc-corner-lb"></div>
+            <div class="bc-scanline" id="bc-scanline"></div>
+          </div>
+          <div class="bc-dim-side"></div>
+        </div>
+        <div class="bc-hint-wrap">
+          <div class="bc-hint" id="bc-hint">바코드를 네모 안에 맞춰봐 📦</div>
+          <div class="bc-hint-sub" id="bc-hint-sub">EAN-13 · QR · Code128 등 자동 인식</div>
+        </div>
+        <div class="bc-dim-bot"></div>
+      </div>
+
+      <!-- 상단 바 -->
+      <div class="bc-top-bar">
+        <button class="bc-top-btn" onclick="closeBarcodeScanner()">✕</button>
+        <span class="bc-top-title">바코드 스캔</span>
+        <button class="bc-top-btn" id="bc-torch-btn" onclick="toggleTorch()" style="font-size:20px">🔦</button>
+      </div>
+
+      <!-- 결과 패널 -->
+      <div class="bc-result-panel" id="bc-result-panel">
+        <div class="bc-rp-handle"></div>
+        <div id="bc-result-content">
+          <!-- JS로 채워짐 -->
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -2123,7 +2226,253 @@ function setMealCat(cat, btn) {
 
 /* ── 음식 사진/바코드 분석 ── */
 function triggerFoodPhoto()    { document.getElementById('food-photo-input').click(); }
-function triggerBarcodePhoto() { document.getElementById('barcode-photo-input').click(); }
+/* ══════════════════════════════════════════════════
+   실시간 바코드 스캐너
+══════════════════════════════════════════════════ */
+let _bcStream     = null;   // MediaStream
+let _bcScanning   = false;  // 스캔 루프 활성 여부
+let _bcDetector   = null;   // BarcodeDetector 인스턴스
+let _bcTorchOn    = false;  // 손전등 상태
+let _bcScanTimer  = null;
+
+async function openBarcodeScanner() {
+  // BarcodeDetector 미지원 → 폴백
+  if (!('BarcodeDetector' in window)) {
+    showToast('이 브라우저는 실시간 스캔 미지원. 사진으로 인식할게!');
+    document.getElementById('barcode-photo-fallback').click();
+    return;
+  }
+
+  const modal = document.getElementById('bc-modal');
+  modal.classList.add('open');
+  _bcScanning = false;
+  _bcTorchOn  = false;
+  setBcHint('카메라 준비 중...', '');
+  hideBcResult();
+
+  try {
+    _bcStream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        facingMode: { ideal: 'environment' },
+        width:  { ideal: 1280 },
+        height: { ideal: 720 },
+      }
+    });
+    const video = document.getElementById('bc-video');
+    video.srcObject = _bcStream;
+    await video.play();
+
+    _bcDetector = new BarcodeDetector({
+      formats: ['ean_13','ean_8','upc_a','upc_e','qr_code','code_128','code_39','itf','data_matrix']
+    });
+    _bcScanning = true;
+    setBcHint('바코드를 네모 안에 맞춰봐 📦', 'EAN-13 · QR · Code128 자동 인식');
+    bcScanLoop();
+  } catch(err) {
+    closeBarcodeScanner();
+    if (err.name === 'NotAllowedError') {
+      showToast('카메라 권한을 허용해줘! 설정 → Safari → 카메라');
+    } else {
+      showToast('카메라를 열 수 없어. 사진으로 시도할게!');
+      document.getElementById('barcode-photo-fallback').click();
+    }
+  }
+}
+
+function closeBarcodeScanner() {
+  _bcScanning = false;
+  clearTimeout(_bcScanTimer);
+  if (_bcStream) { _bcStream.getTracks().forEach(t => t.stop()); _bcStream = null; }
+  const video = document.getElementById('bc-video');
+  if (video) { video.srcObject = null; }
+  document.getElementById('bc-modal').classList.remove('open');
+  hideBcResult();
+}
+
+function setBcHint(main, sub) {
+  const h = document.getElementById('bc-hint');
+  const s = document.getElementById('bc-hint-sub');
+  if (h) h.textContent = main;
+  if (s) s.textContent = sub;
+}
+
+function hideBcResult() {
+  const p = document.getElementById('bc-result-panel');
+  if (p) p.classList.remove('show');
+}
+
+// 스캔 루프 (150ms 간격)
+async function bcScanLoop() {
+  if (!_bcScanning) return;
+  const video = document.getElementById('bc-video');
+  if (!video || video.readyState < 2) {
+    _bcScanTimer = setTimeout(bcScanLoop, 200);
+    return;
+  }
+  try {
+    const codes = await _bcDetector.detect(video);
+    if (codes.length > 0) {
+      const raw = codes[0].rawValue;
+      _bcScanning = false; // 루프 중지
+      navigator.vibrate && navigator.vibrate([80, 40, 80]);
+      setBcHint('✅ 바코드 인식!', raw);
+      showBcLoading();
+      await onBarcodeDetected(raw);
+      return;
+    }
+  } catch(e) { /* 미감지 — 계속 */ }
+  _bcScanTimer = setTimeout(bcScanLoop, 150);
+}
+
+function showBcLoading() {
+  const panel = document.getElementById('bc-result-panel');
+  document.getElementById('bc-result-content').innerHTML =
+    `<div class="bc-loading-dots"><div class="bc-ld"></div><div class="bc-ld"></div><div class="bc-ld"></div></div>
+     <div style="text-align:center;color:#aaa;font-size:13px;padding-bottom:10px">상품 정보 검색 중...</div>`;
+  panel.classList.add('show');
+}
+
+async function onBarcodeDetected(code) {
+  // 1. Open Food Facts 조회
+  let result = null;
+  try {
+    const h = new Date().getHours();
+    const timeHint = h < 10 ? 'breakfast' : h < 14 ? 'lunch' : h < 20 ? 'dinner' : 'snack';
+    result = await fetchOpenFoodFacts(code, timeHint);
+  } catch(e) {}
+
+  if (result) {
+    renderBcResult(result, code);
+  } else {
+    // 2. 못 찾으면 — Claude로 폴백 분석 또는 수동 입력
+    renderBcNotFound(code);
+  }
+}
+
+function renderBcResult(r, code) {
+  const h = new Date().getHours();
+  const mt = r.mealType || (h < 10 ? 'breakfast' : h < 14 ? 'lunch' : h < 20 ? 'dinner' : 'snack');
+  const mtLabel = { breakfast:'아침', lunch:'점심', dinner:'저녁', snack:'간식' };
+
+  document.getElementById('bc-result-content').innerHTML = `
+    <div class="bc-rp-status">
+      <div class="bc-status-icon">🏪</div>
+      <div>
+        <div class="bc-status-title">상품 정보 확인됐어!</div>
+        <div class="bc-status-sub">바코드 ${code} · Open Food Facts</div>
+      </div>
+    </div>
+    <div class="bc-nutrition-grid">
+      <div class="bc-nut-item cal"><div class="bc-nut-val">${r.cal}</div><div class="bc-nut-label">kcal</div></div>
+      <div class="bc-nut-item p"><div class="bc-nut-val">${r.protein}g</div><div class="bc-nut-label">단백질</div></div>
+      <div class="bc-nut-item k"><div class="bc-nut-val">${r.carb}g</div><div class="bc-nut-label">탄수화물</div></div>
+      <div class="bc-nut-item f"><div class="bc-nut-val">${r.fat}g</div><div class="bc-nut-label">지방</div></div>
+    </div>
+    <div class="bc-edit-label">음식 이름 (수정 가능)</div>
+    <div class="bc-edit-row">
+      <input class="bc-edit-input" id="bc-edit-name" value="${esc2(r.name)}" style="-webkit-user-select:text;user-select:text">
+    </div>
+    <div class="bc-edit-label">칼로리 (수정 가능)</div>
+    <div class="bc-edit-row">
+      <div style="flex:1">
+        <input class="bc-edit-input" id="bc-edit-cal" type="number" value="${r.cal}" inputmode="numeric" placeholder="kcal">
+      </div>
+      <div style="flex:1">
+        <input class="bc-edit-input" id="bc-edit-p" type="number" value="${r.protein}" inputmode="decimal" placeholder="단백질g">
+      </div>
+      <div style="flex:1">
+        <input class="bc-edit-input" id="bc-edit-k" type="number" value="${r.carb}" inputmode="decimal" placeholder="탄수g">
+      </div>
+      <div style="flex:1">
+        <input class="bc-edit-input" id="bc-edit-f" type="number" value="${r.fat}" inputmode="decimal" placeholder="지방g">
+      </div>
+    </div>
+    <div class="bc-edit-label">식사 분류</div>
+    <div class="bc-meal-row">
+      ${['breakfast','lunch','dinner','snack'].map(m =>
+        `<button class="bc-mt-btn${m===mt?' sel':''}" data-mt="${m}" onclick="selBcMt(this)">${{breakfast:'🌅<br>아침',lunch:'🌞<br>점심',dinner:'🌆<br>저녁',snack:'🍎<br>간식'}[m]}</button>`
+      ).join('')}
+    </div>
+    <div class="bc-btn-row">
+      <button class="bc-rescan-btn" onclick="bcRescan()">🔄 다시 스캔</button>
+      <button class="bc-save-btn" onclick="bcSave()">✅ 기록하기</button>
+    </div>`;
+}
+
+function renderBcNotFound(code) {
+  document.getElementById('bc-result-content').innerHTML = `
+    <div class="bc-rp-status">
+      <div class="bc-status-icon">😅</div>
+      <div>
+        <div class="bc-status-title">상품 정보를 못 찾았어</div>
+        <div class="bc-status-sub">바코드: ${code}</div>
+      </div>
+    </div>
+    <div style="font-size:13px;color:#888;line-height:1.6;margin-bottom:16px;background:#f8f8f8;border-radius:12px;padding:12px">
+      Open Food Facts DB에 등록되지 않은 상품이야.<br>직접 입력하거나 AI 분석을 시도해봐!
+    </div>
+    <div class="bc-edit-label">음식 이름</div>
+    <div class="bc-edit-row">
+      <input class="bc-edit-input" id="bc-edit-name" placeholder="직접 입력해줘" style="-webkit-user-select:text;user-select:text">
+    </div>
+    <div class="bc-edit-label">칼로리 (kcal)</div>
+    <div class="bc-edit-row">
+      <div style="flex:1"><input class="bc-edit-input" id="bc-edit-cal" type="number" placeholder="칼로리" inputmode="numeric"></div>
+      <div style="flex:1"><input class="bc-edit-input" id="bc-edit-p" type="number" placeholder="단백질g" inputmode="decimal"></div>
+      <div style="flex:1"><input class="bc-edit-input" id="bc-edit-k" type="number" placeholder="탄수g" inputmode="decimal"></div>
+      <div style="flex:1"><input class="bc-edit-input" id="bc-edit-f" type="number" placeholder="지방g" inputmode="decimal"></div>
+    </div>
+    <div class="bc-edit-label">식사 분류</div>
+    <div class="bc-meal-row">
+      ${['breakfast','lunch','dinner','snack'].map((m,i) =>
+        `<button class="bc-mt-btn${i===1?' sel':''}" data-mt="${m}" onclick="selBcMt(this)">${{breakfast:'🌅<br>아침',lunch:'🌞<br>점심',dinner:'🌆<br>저녁',snack:'🍎<br>간식'}[m]}</button>`
+      ).join('')}
+    </div>
+    <div class="bc-btn-row">
+      <button class="bc-rescan-btn" onclick="bcRescan()">🔄 다시 스캔</button>
+      <button class="bc-save-btn" onclick="bcSave()">✅ 기록하기</button>
+    </div>`;
+}
+
+function selBcMt(btn) {
+  document.querySelectorAll('.bc-mt-btn').forEach(b => b.classList.remove('sel'));
+  btn.classList.add('sel');
+}
+
+function bcRescan() {
+  hideBcResult();
+  setBcHint('바코드를 네모 안에 맞춰봐 📦', 'EAN-13 · QR · Code128 자동 인식');
+  _bcScanning = true;
+  bcScanLoop();
+}
+
+function bcSave() {
+  const name = document.getElementById('bc-edit-name')?.value.trim();
+  const cal  = parseInt(document.getElementById('bc-edit-cal')?.value) || 0;
+  const p    = parseInt(document.getElementById('bc-edit-p')?.value)   || 0;
+  const k    = parseInt(document.getElementById('bc-edit-k')?.value)   || 0;
+  const f    = parseInt(document.getElementById('bc-edit-f')?.value)   || 0;
+  const mt   = document.querySelector('.bc-mt-btn.sel')?.dataset.mt || 'snack';
+  if (!name) { showToast('음식 이름을 입력해줘!'); return; }
+  addMealEntry(name, cal, p, k, f, mt);
+  renderCalories(); updateCalBadge();
+  showToast(`🍽️ ${name} ${cal}kcal 기록됐어!`);
+  closeBarcodeScanner();
+}
+
+async function toggleTorch() {
+  if (!_bcStream) return;
+  const track = _bcStream.getVideoTracks()[0];
+  if (!track || !track.getCapabilities().torch) {
+    showToast('손전등이 지원되지 않는 기기야');
+    return;
+  }
+  _bcTorchOn = !_bcTorchOn;
+  await track.applyConstraints({ advanced: [{ torch: _bcTorchOn }] });
+  document.getElementById('bc-torch-btn').textContent = _bcTorchOn ? '💡' : '🔦';
+}
+
+function triggerBarcodePhoto() { document.getElementById('barcode-photo-fallback').click(); }
 
 function onFoodPhoto(e, mode) {
   const file = e.target.files[0]; if (!file) return;
