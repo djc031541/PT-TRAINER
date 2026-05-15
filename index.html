@@ -13,13 +13,27 @@ html{height:100%;-webkit-text-size-adjust:100%}
 body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif;overflow:hidden;background:#f0f0f5;-webkit-user-select:none;user-select:none}
 
 :root{
-  --safe-top:env(safe-area-inset-top,20px);
+  --safe-top:env(safe-area-inset-top,50px);
   --safe-bottom:env(safe-area-inset-bottom,0px);
   --primary:#ff6b35;--primary-light:#ff8c5a;
   --kakao-bg:#bacee0;--header-bg:#2c1810;
   --user-bubble:#fee500;--ai-bubble:#fff;
   --dark:#1a1a1a;--gray:#888;--light:#f5f5f5;
   --nav-h:60px;
+}
+/* iPhone 17 Pro Max / Dynamic Island 대응 */
+@supports (padding-top: env(safe-area-inset-top)) {
+  :root { --safe-top: env(safe-area-inset-top); --safe-bottom: env(safe-area-inset-bottom); }
+}
+/* 큰 화면(iPad·Plus 모델) 최적화 */
+@media (min-width: 430px) {
+  .bubble { font-size: 15px; }
+  .msg-body { max-width: 72%; }
+  .ia-input { font-size: 16px; }
+}
+@media (min-width: 768px) {
+  #screen-app { max-width: 480px; margin: 0 auto; }
+  .chat-header, .bottom-nav { max-width: 480px; }
 }
 
 /* ── SCREEN WRAPPER ── */
@@ -511,7 +525,8 @@ body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic N
       <span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span>
     </div>
     <div class="cal-grid" id="cal-grid"></div>
-    <button class="mark-today-btn" id="mark-today-btn" onclick="markToday()">✅ 오늘 운동 완료!</button>
+    <button class="mark-today-btn" id="mark-today-btn" onclick="triggerWorkoutPhoto()">📷 운동 사진 인증하기</button>
+    <input type="file" id="workout-photo-input" accept="image/*" capture="environment" style="display:none" onchange="onWorkoutPhoto(event)">
     <div class="health-import-card">
       <div class="health-card-title">🍎 Apple 건강 데이터 가져오기</div>
       <div class="health-card-sub">웹에서는 건강 앱 직접 연동이 불가능해. 대신 건강 데이터를 내보내서 업로드하면 운동 기록을 자동으로 불러올 수 있어!</div>
@@ -998,52 +1013,51 @@ function sysPrompt() {
 1. ⌚ 애플워치/운동 사진 → 운동 종류·시간·소모칼로리·심박수 분석, 심박수 목표범위(최대심박수 60~75%) 평가, 추천 세트(세트×횟수), 쿨다운 안내.
 2. 🍽️ 음식/바코드 사진 → 한국 식약처 식품영양성분DB + 농촌진흥청 + USDA 기준 칼로리·영양소 계산. 음식명 **굵게** 먼저 표시. 고혈압이므로 나트륨 높은 음식 경고.
 
-🔴 【자동기록 태그 — 최우선 절대 규칙】 이미지가 포함된 메시지에 응답할 때, 반드시 응답의 **첫 번째 줄**에 아래 태그 중 하나를 단독으로 출력하고, 그 다음 줄부터 분석 내용을 작성할 것. 태그 형식 절대 변경 금지.
-음식/음료/바코드: [RECORD:{"t":"food","name":"음식명(간결하게)","cal":총칼로리정수,"p":단백질g정수,"k":탄수화물g정수,"f":지방g정수}]
-운동/워치/소모: [RECORD:{"t":"ex","name":"운동명","cal":소모칼로리정수}]
-이미지 없거나 해당없음: [RECORD:{"t":"none"}]
+🔴 【자동기록 태그 — 최우선 절대 규칙】 매 응답 **첫 번째 줄**에 반드시 아래 태그 중 하나만 단독으로 출력하고, 그 다음 줄부터 본문을 작성할 것. 형식 절대 변경 금지.
+▸ 사진에 음식/음료/바코드 있거나, 텍스트로 먹은 음식/식사 언급 시:
+  [RECORD:{"t":"food","name":"음식명(간결하게)","cal":총칼로리정수,"p":단백질g정수,"k":탄수화물g정수,"f":지방g정수}]
+▸ 사진에 운동/워치 있거나, 텍스트로 운동 완료/칼로리 소모 언급 시:
+  [RECORD:{"t":"ex","name":"운동명","cal":소모칼로리정수}]
+▸ 위 두 경우 모두 해당없음(운동 계획 질문·동기부여·일반 대화 등):
+  [RECORD:{"t":"none"}]
+※ cal값은 반드시 한국 식품영양성분 기준 실제 정수. 0 절대 금지. 여러 음식이면 합산.
 
 💡 답변: 반말, 핵심 위주, 격려로 마무리, 마크다운 **굵은글씨** 사용 가능`;
 }
 
 /* addAI: 라이브 메시지 (chips 포함, 히스토리 저장, 자동기록)
-   fromImg=true면 [RECORD:{...}] 태그 파싱 → 칼로리/운동 자동기록 */
+   RECORD 태그가 있으면 사진/텍스트 관계없이 항상 자동기록 */
 function addAI(rawText, saveHist = true, fromImg = false) {
-  // ── [RECORD:{...}] 태그 파싱 (응답 첫줄 또는 어디든 존재 가능, 화면에는 숨김) ──
+  // ── [RECORD:{...}] 태그 파싱 (첫 줄 우선, 어디든 fallback) ──
   let text = rawText;
   let autoRecord = null;
-  // 첫 줄에 RECORD 태그가 있는지 먼저 확인 (새 방식: 첫줄에 위치)
   const firstLine = rawText.split('\n')[0].trim();
-  const firstLineMatch = firstLine.match(/^\[RECORD:(\{.*?\})\]$/);
-  if (firstLineMatch) {
-    try { autoRecord = JSON.parse(firstLineMatch[1]); } catch(e) { console.error('RECORD parse err', e); }
-    // 첫 줄 제거 후 남은 텍스트 (앞뒤 공백 제거)
+  const firstMatch = firstLine.match(/^\[RECORD:(\{[^}]*\})\]$/);
+  if (firstMatch) {
+    try { autoRecord = JSON.parse(firstMatch[1]); } catch(e) {}
     text = rawText.replace(/^\[RECORD:\{[^}]*\}\]\s*\n?/, '').trimStart();
   } else {
-    // 구버전 호환: 텍스트 어딘가에 RECORD 태그가 있는 경우
-    const recMatch = rawText.match(/\[RECORD:(\{[^}]*\})\]/);
-    if (recMatch) {
-      try { autoRecord = JSON.parse(recMatch[1]); } catch(e) { console.error('RECORD parse err', e); }
+    // fallback: 어딘가에 태그가 있는 경우
+    const anyMatch = rawText.match(/\[RECORD:(\{[^}]*\})\]/);
+    if (anyMatch) {
+      try { autoRecord = JSON.parse(anyMatch[1]); } catch(e) {}
       text = rawText.replace(/\[RECORD:\{[^}]*\}\]\s*/g, '').trimEnd();
     }
   }
-  // fromImg인데 RECORD 태그가 없는 경우 → 응답이 잘렸거나 Claude가 무시한 경우
-  // 이때 extractCals/extractExerciseCals 폴백 사용
+  // RECORD 태그가 없는 경우 텍스트 추출 폴백 (이미지 응답 한정)
   if (fromImg && !autoRecord) {
-    const fallbackCal = extractCals(rawText);
-    const fallbackExCal = extractExerciseCals(rawText);
-    if (fallbackCal > 0) {
-      autoRecord = { t: 'food', name: '식사', cal: fallbackCal, p: 0, k: 0, f: 0 };
-    } else if (fallbackExCal > 0 || detectWorkout(rawText)) {
-      autoRecord = { t: 'ex', name: '운동', cal: fallbackExCal || 0 };
-    }
+    const fbCal = extractCals(rawText);
+    const fbEx  = extractExerciseCals(rawText);
+    if (fbCal > 0)       autoRecord = { t:'food', name:'식사', cal:fbCal, p:0, k:0, f:0 };
+    else if (fbEx > 0)   autoRecord = { t:'ex',   name:'운동', cal:fbEx };
+    else if (detectWorkout(rawText)) autoRecord = { t:'ex', name:'운동', cal:0 };
   }
 
   const msgs = document.getElementById('chat-msgs');
   ensureDateSep(msgs);
 
-  // ── 자동 기록 ──
-  if (fromImg && autoRecord && autoRecord.t !== 'none') {
+  // ── 자동 기록 (RECORD 태그 기반 — 사진·텍스트 모두 적용) ──
+  if (autoRecord && autoRecord.t !== 'none') {
     const h  = new Date().getHours();
     const mt = h < 10 ? 'breakfast' : h < 14 ? 'lunch' : h < 20 ? 'dinner' : 'snack';
     if (autoRecord.t === 'food' && autoRecord.cal > 0) {
@@ -1057,7 +1071,7 @@ function addAI(rawText, saveHist = true, fromImg = false) {
       addExerciseEntry(autoRecord.name || '운동', autoRecord.cal);
       markToday();
       setTimeout(() => {
-        showToast(`💪 ${autoRecord.name} ${autoRecord.cal}kcal 소모! 운동 탭 자동 기록 + 캘린더 체크 완료!`);
+        showToast(`💪 ${autoRecord.name} ${autoRecord.cal}kcal 소모! 칼로리 탭 + 캘린더 자동 기록 완료!`);
         if (currentTab === 'calories') renderCalories();
       }, 500);
     }
@@ -1070,20 +1084,23 @@ function addAI(rawText, saveHist = true, fromImg = false) {
   const cals     = extractCals(text);
   const exCals   = extractExerciseCals(text);
   const isWorkout= detectWorkout(text);
+  const wasAutoFood = autoRecord && autoRecord.t === 'food' && autoRecord.cal > 0;
+  const wasAutoEx   = autoRecord && autoRecord.t === 'ex'   && autoRecord.cal > 0;
   let chipsHtml  = '';
 
-  if (autoRecord && autoRecord.t === 'food') {
-    chipsHtml += `<button class="msg-chip" style="opacity:.6;cursor:default;font-size:11px">✅ ${autoRecord.cal}kcal 칼로리 탭 자동 기록 완료</button>`;
+  if (wasAutoFood) {
+    chipsHtml += `<button class="msg-chip" style="opacity:.65;cursor:default;font-size:11px;border-color:#4caf50;color:#4caf50">✅ ${autoRecord.cal}kcal 칼로리 탭 자동 기록!</button>`;
   } else if (cals) {
     chipsHtml += `<button class="msg-chip" onclick="offerCalorie(${cals},this)">🍽️ ${cals}kcal 섭취 기록</button>`;
   }
-  if (autoRecord && autoRecord.t === 'ex') {
-    chipsHtml += `<button class="msg-chip" style="border-color:#4caf50;color:#4caf50;opacity:.6;cursor:default;font-size:11px">✅ ${autoRecord.cal}kcal 소모 자동 기록 완료</button>`;
+  if (wasAutoEx) {
+    chipsHtml += `<button class="msg-chip" style="border-color:#4caf50;color:#4caf50;opacity:.65;cursor:default;font-size:11px">✅ ${autoRecord.cal}kcal 소모 + 캘린더 자동 기록!</button>`;
   } else if (exCals) {
     chipsHtml += `<button class="msg-chip" style="border-color:#4caf50;color:#4caf50" onclick="offerExercise(${exCals},this)">🔥 ${exCals}kcal 소모 기록</button>`;
   }
-  if (isWorkout || exCals || (autoRecord && autoRecord.t === 'ex')) {
-    chipsHtml += `<button class="msg-chip" onclick="markTodayFromChat(this)">📅 운동 완료 기록</button>`;
+  // 운동 완료 칩: 자동 기록 안 됐고 운동 내용인 경우만 표시
+  if (!wasAutoEx && (isWorkout || exCals)) {
+    chipsHtml += `<button class="msg-chip" onclick="markTodayFromChat(this)">📅 오늘 운동 완료 기록</button>`;
   }
   chipsHtml += `<button class="msg-chip" onclick="promptSaveRoutine(this)">📌 루틴 저장</button>`;
 
@@ -1149,11 +1166,28 @@ function ensureDateSep(msgs) {
 }
 
 function renderMd(t) {
-  return t
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
-    .replace(/\*(.*?)\*/g,'<em>$1</em>')
-    .replace(/\n/g,'<br>');
+  // escape HTML first
+  let s = t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  // markdown table → HTML table
+  s = s.replace(/((?:^\|.+\|[ \t]*\n)+)/gm, tbl => {
+    const rows = tbl.trim().split('\n').filter(r => r.trim());
+    const filtered = rows.filter(r => !/^\|[\s|:-]+\|/.test(r)); // remove separator rows
+    let html = '<table style="border-collapse:collapse;width:100%;font-size:12.5px;margin:6px 0">';
+    filtered.forEach((row, i) => {
+      const cells = row.split('|').slice(1,-1).map(c => c.trim());
+      const tag = i === 0 ? 'th' : 'td';
+      const style = i === 0
+        ? 'style="background:#f0f0f0;padding:5px 7px;border:1px solid #ddd;font-weight:700;text-align:left"'
+        : 'style="padding:5px 7px;border:1px solid #eee;vertical-align:top"';
+      html += `<tr>${cells.map(c=>`<${tag} ${style}>${c}</${tag}>`).join('')}</tr>`;
+    });
+    return html + '</table>';
+  });
+  s = s.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+       .replace(/\*(.*?)\*/g,'<em>$1</em>')
+       .replace(/^#{1,3}\s(.+)$/gm,'<strong style="font-size:15px">$1</strong>')
+       .replace(/\n/g,'<br>');
+  return s;
 }
 function esc(t) { return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>'); }
 function nowTime() {
@@ -1432,26 +1466,100 @@ function toggleDay(ds) {
   renderCalendar();
 }
 
-function markToday() {
+function markToday(silent = false) {
   const log = getWorkoutLog();
   const today = todayStr();
   if (!log.includes(today)) {
     log.push(today);
     saveWorkoutLog(log);
-    showToast('🔥 오늘 운동 완료! 캘린더에 기록됐어!');
+    if (!silent) showToast('🔥 오늘 운동 완료! 캘린더에 기록됐어!');
   } else {
-    showToast('✅ 이미 오늘 운동 완료로 기록되어 있어!');
+    if (!silent) showToast('✅ 이미 오늘 운동 완료로 기록되어 있어!');
   }
   renderCalendar();
   updateMarkBtn();
+  updateStreak();
 }
 
 function updateMarkBtn() {
   const btn = document.getElementById('mark-today-btn');
   if (!btn) return;
   const done = getWorkoutLog().includes(todayStr());
-  btn.textContent = done ? '✅ 오늘 운동 완료됨!' : '✅ 오늘 운동 완료!';
+  btn.textContent = done ? '✅ 오늘 운동 인증 완료! (탭 → 취소)' : '📷 운동 사진 인증하기';
   btn.classList.toggle('done', done);
+}
+
+function triggerWorkoutPhoto() {
+  if (getWorkoutLog().includes(todayStr())) {
+    // 이미 완료 상태 → 취소 확인
+    if (confirm('오늘 운동 기록을 취소할까요?')) {
+      toggleDay(todayStr());
+      updateMarkBtn();
+      showToast('운동 기록이 취소됐어');
+    }
+    return;
+  }
+  document.getElementById('workout-photo-input').click();
+}
+
+async function onWorkoutPhoto(e) {
+  const file = e.target.files[0]; if (!file) return;
+  e.target.value = '';
+  const btn = document.getElementById('mark-today-btn');
+  btn.textContent = '⏳ 사진 분석 중...';
+  btn.disabled = true;
+
+  compressImg(file, async b64 => {
+    try {
+      const key = getKey();
+      if (!key) { openKeyModal(); throw new Error('API 키 없음'); }
+      const res = await fetch(CLAUDE_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': key,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({
+          model: MODEL, max_tokens: 512,
+          system: sysPrompt(),
+          messages: [{ role:'user', content:[
+            { type:'image', source:{ type:'base64', media_type:'image/jpeg', data:b64 } },
+            { type:'text', text:'운동 인증 사진이야. 운동 종류, 시간, 소모 칼로리를 분석해줘.' }
+          ]}]
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error?.message || '분석 실패');
+      const reply = data.content?.[0]?.text || '';
+
+      // RECORD 태그 파싱
+      let autoRec = null;
+      const fl = reply.split('\n')[0].trim();
+      const fm = fl.match(/^\[RECORD:(\{[^}]*\})\]$/);
+      if (fm) { try { autoRec = JSON.parse(fm[1]); } catch(ee) {} }
+      if (!autoRec) {
+        const am = reply.match(/\[RECORD:(\{[^}]*\})\]/);
+        if (am) { try { autoRec = JSON.parse(am[1]); } catch(ee) {} }
+      }
+
+      markToday(true); // 캘린더 인증 완료 (silent - 아래서 토스트 별도 표시)
+      if (autoRec && autoRec.t === 'ex' && autoRec.cal > 0) {
+        addExerciseEntry(autoRec.name || '운동', autoRec.cal);
+        renderCalories();
+        showToast(`🏋️ ${autoRec.name} ${autoRec.cal}kcal 소모! 인증 완료 🔥`);
+      } else {
+        showToast('💪 운동 인증 완료! 캘린더에 기록됐어!');
+      }
+    } catch(err) {
+      console.error(err);
+      showToast('❌ 분석 실패. 다시 시도해봐!');
+    } finally {
+      updateMarkBtn();
+      btn.disabled = false;
+    }
+  });
 }
 
 function calcStreak() {
