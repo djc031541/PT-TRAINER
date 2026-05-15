@@ -346,27 +346,72 @@ body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic N
 .food-cam-btn:active{opacity:.85}
 .food-barcode-btn{flex:1;background:linear-gradient(135deg,#2196f3,#1565c0);border:none;border-radius:14px;padding:13px 8px;color:#fff;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;box-shadow:0 4px 14px rgba(33,150,243,.3);-webkit-appearance:none}
 .food-barcode-btn:active{opacity:.85}
-/* 음식 검색 모달 */
-.food-search-modal .modal-sheet{max-height:90vh;display:flex;flex-direction:column}
-.fs-search-wrap{position:relative;margin-bottom:10px;flex-shrink:0}
-.fs-input{width:100%;border:2px solid #eee;border-radius:14px;padding:12px 14px 12px 40px;font-size:15px;font-family:inherit;outline:none;-webkit-appearance:none;transition:border-color .2s;-webkit-user-select:text;user-select:text;background:#f8f8f8}
+/* ══ 음식 검색 — 전체화면 모달 ══ */
+.food-search-modal{align-items:stretch!important}
+.food-search-modal .modal-sheet{
+  border-radius:0;max-height:100%;height:100%;
+  padding:calc(var(--safe-top)+8px) 0 calc(var(--safe-bottom)+8px);
+  display:flex;flex-direction:column;overflow:hidden
+}
+.fs-header{display:flex;align-items:center;gap:10px;padding:0 14px 10px;flex-shrink:0;border-bottom:1px solid #f0f0f0}
+.fs-close{width:36px;height:36px;background:#f0f0f5;border:none;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;-webkit-appearance:none}
+.fs-title{font-size:18px;font-weight:800;color:#222;flex:1}
+.fs-search-wrap{position:relative;padding:10px 14px;flex-shrink:0;background:#fff}
+.fs-input{width:100%;border:2px solid #eee;border-radius:16px;padding:14px 16px 14px 46px;font-size:16px;font-family:inherit;outline:none;-webkit-appearance:none;transition:border-color .2s;-webkit-user-select:text;user-select:text;background:#f7f7f7;color:#222}
 .fs-input:focus{border-color:var(--primary);background:#fff}
-.fs-input-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:18px;pointer-events:none}
-.fs-loading{text-align:center;padding:20px;color:#aaa;font-size:13px;display:none}
-.fs-tabs{display:flex;gap:6px;margin-bottom:10px;flex-shrink:0;overflow-x:auto;scrollbar-width:none}
+.fs-input-icon{position:absolute;left:28px;top:50%;transform:translateY(-50%);font-size:20px;pointer-events:none}
+.fs-input-clear{position:absolute;right:28px;top:50%;transform:translateY(-50%);width:24px;height:24px;background:#ccc;border:none;border-radius:50%;color:#fff;font-size:13px;cursor:pointer;display:none;align-items:center;justify-content:center;-webkit-appearance:none;font-weight:700}
+.fs-input-clear.show{display:flex}
+.fs-tabs{display:flex;gap:7px;padding:6px 14px 10px;flex-shrink:0;overflow-x:auto;scrollbar-width:none;background:#fff;border-bottom:1px solid #f0f0f0}
 .fs-tabs::-webkit-scrollbar{display:none}
-.fs-tab{background:#f0f0f5;border:none;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:600;color:#666;font-family:inherit;cursor:pointer;white-space:nowrap;transition:all .15s;-webkit-appearance:none;flex-shrink:0}
-.fs-tab.active{background:var(--primary);color:#fff}
-.fs-results{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:200px}
-.fs-item{display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid #f0f0f0;cursor:pointer;transition:background .15s;-webkit-tap-highlight-color:transparent}
-.fs-item:active{background:#fff5f2}
-.fs-item-icon{font-size:24px;flex-shrink:0;width:36px;text-align:center}
-.fs-item-info{flex:1;min-width:0}
-.fs-item-name{font-size:14px;font-weight:600;color:#222;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.fs-item-meta{font-size:12px;color:#888;margin-top:2px}
-.fs-item-cal{font-size:15px;font-weight:800;color:var(--primary);flex-shrink:0}
-.fs-empty{text-align:center;padding:40px 20px;color:#bbb;font-size:13px}
-.fs-source-badge{font-size:10px;background:#e8f4ff;color:#2196f3;padding:2px 6px;border-radius:8px;margin-left:4px;font-weight:600}
+.fs-tab{background:#f0f0f5;border:none;border-radius:20px;padding:7px 15px;font-size:13px;font-weight:600;color:#666;font-family:inherit;cursor:pointer;white-space:nowrap;transition:all .15s;-webkit-appearance:none;flex-shrink:0}
+.fs-tab.active{background:var(--primary);color:#fff;box-shadow:0 3px 10px rgba(255,107,53,.3)}
+.fs-status{padding:6px 14px;font-size:12px;color:#aaa;display:flex;align-items:center;gap:6px;flex-shrink:0}
+.fs-spinner{width:14px;height:14px;border:2px solid #ddd;border-top-color:var(--primary);border-radius:50%;animation:spin .7s linear infinite;display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.fs-spinner.show{display:block}
+.fs-results{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.fs-section-hd{padding:10px 14px 4px;font-size:11px;font-weight:800;color:#aaa;letter-spacing:.8px;text-transform:uppercase;background:#f8f8f8;border-top:1px solid #f0f0f0;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;gap:6px}
+.fs-item{display:flex;align-items:center;gap:12px;padding:13px 14px;border-bottom:1px solid #f5f5f5;cursor:pointer;transition:background .12s;-webkit-tap-highlight-color:transparent;background:#fff}
+.fs-item:active{background:#fff5f1}
+.fs-item-icon{font-size:28px;flex-shrink:0;width:40px;text-align:center;line-height:1}
+.fs-item-body{flex:1;min-width:0}
+.fs-item-row1{display:flex;align-items:center;gap:6px;margin-bottom:3px;flex-wrap:wrap}
+.fs-item-name{font-size:15px;font-weight:700;color:#111}
+.fs-brand-badge{font-size:10px;background:#fff0ea;color:var(--primary);padding:2px 7px;border-radius:8px;font-weight:700;flex-shrink:0;border:1px solid rgba(255,107,53,.2)}
+.fs-off-badge{font-size:10px;background:#e8f4ff;color:#2196f3;padding:2px 7px;border-radius:8px;font-weight:700;flex-shrink:0}
+.fs-item-row2{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.fs-macro{font-size:11.5px;color:#888;display:flex;align-items:center;gap:3px}
+.fs-macro-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.fs-macro-dot.p{background:#4caf50}.fs-macro-dot.k{background:#ff9800}.fs-macro-dot.f{background:#f44336}
+.fs-item-unit{font-size:11px;color:#ccc;margin-left:4px}
+.fs-item-right{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0}
+.fs-item-cal{font-size:20px;font-weight:900;color:var(--primary);line-height:1}
+.fs-item-kcal{font-size:10px;font-weight:500;color:#bbb}
+.fs-item-add{width:32px;height:32px;background:var(--primary);border:none;border-radius:50%;color:#fff;font-size:20px;font-weight:300;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-appearance:none;box-shadow:0 3px 8px rgba(255,107,53,.35);flex-shrink:0;transition:transform .1s}
+.fs-item-add:active{transform:scale(.9)}
+.fs-empty{text-align:center;padding:50px 20px;color:#ccc;font-size:14px;line-height:1.8}
+/* 서빙 선택 팝업 */
+.fs-serving-popup{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400;display:none;align-items:center;justify-content:center;padding:20px}
+.fs-serving-popup.open{display:flex}
+.fs-serving-sheet{background:#fff;border-radius:20px;padding:22px 20px;width:100%;max-width:360px;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.fs-serving-title{font-size:16px;font-weight:800;margin-bottom:4px;color:#222}
+.fs-serving-sub{font-size:13px;color:#888;margin-bottom:16px}
+.fs-serving-preview{background:#fff8f5;border-radius:14px;padding:14px;margin-bottom:16px;display:flex;justify-content:space-around}
+.fs-sp-item{text-align:center}
+.fs-sp-val{font-size:18px;font-weight:800;color:var(--primary)}
+.fs-sp-label{font-size:11px;color:#aaa;margin-top:2px}
+.fs-qty-row{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:18px}
+.fs-qty-btn{width:44px;height:44px;border:2px solid #eee;border-radius:50%;background:#fff;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-appearance:none;color:#555;transition:all .15s;font-weight:300}
+.fs-qty-btn:active{background:#f5f5f5}
+.fs-qty-val{font-size:22px;font-weight:800;color:#222;min-width:50px;text-align:center}
+.fs-serving-row{display:flex;gap:8px;margin-bottom:14px}
+.fs-serving-opt{flex:1;border:2px solid #eee;border-radius:12px;padding:8px 4px;font-size:12px;font-weight:600;font-family:inherit;color:#888;background:#fff;cursor:pointer;text-align:center;-webkit-appearance:none;transition:all .15s}
+.fs-serving-opt.sel{border-color:var(--primary);color:var(--primary);background:#fff8f5}
+.fs-meal-row{display:flex;gap:6px;margin-bottom:16px}
+.fs-mt-btn{flex:1;border:1.5px solid #eee;border-radius:10px;padding:8px 2px;font-size:11px;font-weight:600;font-family:inherit;color:#bbb;cursor:pointer;text-align:center;background:#fff;-webkit-appearance:none;transition:all .15s}
+.fs-mt-btn.sel{border-color:var(--primary);color:var(--primary);background:#fff8f5}
+.fs-confirm-btn{width:100%;background:var(--primary);color:#fff;border:none;border-radius:14px;padding:15px;font-size:16px;font-weight:800;font-family:inherit;cursor:pointer;-webkit-appearance:none;box-shadow:0 6px 20px rgba(255,107,53,.35)}
 /* ── 식사 카테고리 탭 ── */
 .meal-cat-tabs{display:flex;gap:6px;padding:10px 14px 2px;overflow-x:auto;scrollbar-width:none}
 .meal-cat-tabs::-webkit-scrollbar{display:none}
@@ -784,18 +829,23 @@ body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic N
   </div>
 </div>
 
-<!-- Food Search Modal -->
-<div class="modal-bg food-search-modal" id="food-search-modal" onclick="if(event.target===this)this.classList.remove('open')">
-  <div class="modal-sheet" style="max-height:88vh;display:flex;flex-direction:column;padding-bottom:calc(var(--safe-bottom)+16px)">
-    <div class="modal-handle"></div>
-    <div class="modal-title" style="flex-shrink:0">🔍 음식 검색</div>
+<!-- Food Search Modal (전체화면) -->
+<div class="modal-bg food-search-modal" id="food-search-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle" style="margin-bottom:0"></div>
+    <div class="fs-header">
+      <button class="fs-close" onclick="document.getElementById('food-search-modal').classList.remove('open')">✕</button>
+      <div class="fs-title">🔍 음식 검색</div>
+    </div>
     <div class="fs-search-wrap">
       <span class="fs-input-icon">🔍</span>
-      <input type="text" class="fs-input" id="fs-input" placeholder="음식명 검색 (예: 비빔밥, 삼겹살, 바나나...)"
+      <input type="text" class="fs-input" id="fs-input" placeholder="음식명·브랜드 검색 (예: 신라면, 비빔밥, 바나나...)"
         autocomplete="off" autocorrect="off" oninput="onFoodSearch(this.value)" style="-webkit-user-select:text;user-select:text">
+      <button class="fs-input-clear" id="fs-clear" onclick="clearFsInput()">✕</button>
     </div>
-    <div class="fs-tabs" id="fs-tabs">
+    <div class="fs-tabs">
       <button class="fs-tab active" onclick="setFsTab('all',this)">전체</button>
+      <button class="fs-tab" onclick="setFsTab('brand',this)">🏪 브랜드</button>
       <button class="fs-tab" onclick="setFsTab('rice',this)">🍚 밥류</button>
       <button class="fs-tab" onclick="setFsTab('soup',this)">🍲 국/찌개</button>
       <button class="fs-tab" onclick="setFsTab('meat',this)">🥩 육류</button>
@@ -805,8 +855,43 @@ body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic N
       <button class="fs-tab" onclick="setFsTab('fruit',this)">🍎 과일</button>
       <button class="fs-tab" onclick="setFsTab('drink',this)">☕ 음료</button>
     </div>
-    <div class="fs-loading" id="fs-loading">🔄 검색 중...</div>
+    <div class="fs-status" id="fs-status">
+      <div class="fs-spinner" id="fs-spinner"></div>
+      <span id="fs-status-txt">자주 먹는 음식이나 브랜드를 검색해봐!</span>
+    </div>
     <div class="fs-results" id="fs-results"></div>
+  </div>
+</div>
+
+<!-- 서빙 선택 팝업 -->
+<div class="fs-serving-popup" id="fs-serving-popup">
+  <div class="fs-serving-sheet">
+    <div class="fs-serving-title" id="fsp-name">음식 이름</div>
+    <div class="fs-serving-sub" id="fsp-unit">1인분 기준</div>
+    <div class="fs-serving-preview">
+      <div class="fs-sp-item"><div class="fs-sp-val" id="fsp-cal">0</div><div class="fs-sp-label">kcal</div></div>
+      <div class="fs-sp-item"><div class="fs-sp-val" id="fsp-p" style="color:#4caf50">0g</div><div class="fs-sp-label">단백질</div></div>
+      <div class="fs-sp-item"><div class="fs-sp-val" id="fsp-k" style="color:#ff9800">0g</div><div class="fs-sp-label">탄수화물</div></div>
+      <div class="fs-sp-item"><div class="fs-sp-val" id="fsp-f" style="color:#f44336">0g</div><div class="fs-sp-label">지방</div></div>
+    </div>
+    <div class="fs-qty-row">
+      <button class="fs-qty-btn" onclick="changeQty(-0.5)">−</button>
+      <div class="fs-qty-val" id="fsp-qty">1</div>
+      <button class="fs-qty-btn" onclick="changeQty(0.5)">+</button>
+    </div>
+    <div class="fs-serving-row">
+      <button class="fs-serving-opt sel" onclick="setServingMult(0.5,this)">½인분</button>
+      <button class="fs-serving-opt" onclick="setServingMult(1,this)">1인분</button>
+      <button class="fs-serving-opt" onclick="setServingMult(1.5,this)">1.5인분</button>
+      <button class="fs-serving-opt" onclick="setServingMult(2,this)">2인분</button>
+    </div>
+    <div class="fs-meal-row">
+      <button class="fs-mt-btn sel" data-mt="breakfast" onclick="selFsMt(this)">🌅<br>아침</button>
+      <button class="fs-mt-btn" data-mt="lunch" onclick="selFsMt(this)">🌞<br>점심</button>
+      <button class="fs-mt-btn" data-mt="dinner" onclick="selFsMt(this)">🌆<br>저녁</button>
+      <button class="fs-mt-btn" data-mt="snack" onclick="selFsMt(this)">🍎<br>간식</button>
+    </div>
+    <button class="fs-confirm-btn" onclick="confirmServingAdd()">✅ 기록하기</button>
   </div>
 </div>
 
@@ -2395,6 +2480,81 @@ function extractFoodName(text) {
 /* ══════════════════════════════════════════════════
    FOOD SEARCH
 ══════════════════════════════════════════════════ */
+// 한국 브랜드 제품 DB
+const KR_BRAND_DB = [
+  // ── 농심 ──
+  {n:'신라면',b:'농심',c:500,p:10,k:80,f:16,cat:'brand',icon:'🍜',unit:'1봉(120g)'},
+  {n:'짜파게티',b:'농심',c:560,p:11,k:86,f:18,cat:'brand',icon:'🍜',unit:'1봉(140g)'},
+  {n:'너구리',b:'농심',c:520,p:11,k:81,f:17,cat:'brand',icon:'🍜',unit:'1봉(120g)'},
+  {n:'안성탕면',b:'농심',c:500,p:10,k:79,f:16,cat:'brand',icon:'🍜',unit:'1봉(125g)'},
+  {n:'육개장사발면',b:'농심',c:340,p:7,k:55,f:10,cat:'brand',icon:'🍜',unit:'1개(86g)'},
+  {n:'새우깡',b:'농심',c:130,p:2,k:19,f:5,cat:'brand',icon:'🍿',unit:'1봉(70g)'},
+  {n:'포테이토칩(오리지널)',b:'농심',c:180,p:2,k:20,f:10,cat:'brand',icon:'🥔',unit:'1봉(55g)'},
+  {n:'고구마깡',b:'농심',c:110,p:1,k:18,f:4,cat:'brand',icon:'🍠',unit:'1봉(55g)'},
+  // ── 삼양 ──
+  {n:'불닭볶음면',b:'삼양',c:530,p:14,k:79,f:17,cat:'brand',icon:'🔥',unit:'1봉(140g)'},
+  {n:'불닭볶음탕면',b:'삼양',c:520,p:13,k:76,f:17,cat:'brand',icon:'🔥',unit:'1봉(140g)'},
+  {n:'까르보불닭볶음면',b:'삼양',c:690,p:17,k:89,f:29,cat:'brand',icon:'🔥',unit:'1봉(130g)'},
+  {n:'삼양라면',b:'삼양',c:500,p:10,k:78,f:16,cat:'brand',icon:'🍜',unit:'1봉(120g)'},
+  // ── 오뚜기 ──
+  {n:'진라면(매운맛)',b:'오뚜기',c:500,p:11,k:78,f:16,cat:'brand',icon:'🍜',unit:'1봉(120g)'},
+  {n:'진라면(순한맛)',b:'오뚜기',c:490,p:11,k:77,f:15,cat:'brand',icon:'🍜',unit:'1봉(120g)'},
+  {n:'컵누들(해물)',b:'오뚜기',c:65,p:3,k:10,f:1,cat:'brand',icon:'🍜',unit:'1개(38g)'},
+  {n:'참깨라면',b:'오뚜기',c:570,p:12,k:82,f:21,cat:'brand',icon:'🍜',unit:'1봉(135g)'},
+  // ── 팔도 ──
+  {n:'팔도 비빔면',b:'팔도',c:430,p:10,k:75,f:9,cat:'brand',icon:'🍜',unit:'1봉(130g)'},
+  {n:'왕뚜껑',b:'팔도',c:370,p:8,k:59,f:12,cat:'brand',icon:'🍜',unit:'1개(110g)'},
+  // ── 오리온 ──
+  {n:'초코파이',b:'오리온',c:165,p:2,k:25,f:6,cat:'brand',icon:'🍫',unit:'1개(39g)'},
+  {n:'포카칩(오리지날)',b:'오리온',c:165,p:2,k:20,f:9,cat:'brand',icon:'🥔',unit:'1봉(66g)'},
+  {n:'오징어집',b:'오리온',c:95,p:2,k:14,f:4,cat:'brand',icon:'🦑',unit:'1봉(50g)'},
+  {n:'닥터유 단백질바',b:'오리온',c:200,p:15,k:23,f:5,cat:'brand',icon:'💪',unit:'1개(50g)'},
+  {n:'마켓오 리얼브라우니',b:'오리온',c:230,p:3,k:32,f:11,cat:'brand',icon:'🍫',unit:'1개(60g)'},
+  // ── 롯데 ──
+  {n:'빼빼로(오리지날)',b:'롯데',c:190,p:3,k:30,f:7,cat:'brand',icon:'🍫',unit:'1봉(54g)'},
+  {n:'칙촉',b:'롯데',c:200,p:2,k:25,f:10,cat:'brand',icon:'🍪',unit:'1봉(55g)'},
+  {n:'빅파이',b:'롯데',c:180,p:2,k:24,f:9,cat:'brand',icon:'🥧',unit:'1개(45g)'},
+  {n:'자일리톨껌',b:'롯데',c:5,p:0,k:2,f:0,cat:'brand',icon:'🍬',unit:'1알(3g)'},
+  // ── 해태 ──
+  {n:'홈런볼',b:'해태',c:160,p:2,k:22,f:7,cat:'brand',icon:'⚾',unit:'1봉(50g)'},
+  {n:'에이스',b:'해태',c:130,p:2,k:20,f:5,cat:'brand',icon:'🃏',unit:'1봉(50g)'},
+  {n:'맛동산',b:'해태',c:145,p:2,k:21,f:6,cat:'brand',icon:'🍡',unit:'1봉(50g)'},
+  // ── CJ ──
+  {n:'햇반(흰쌀밥)',b:'CJ',c:300,p:5,k:66,f:1,cat:'brand',icon:'🍚',unit:'1개(210g)'},
+  {n:'햇반 흑미밥',b:'CJ',c:290,p:5,k:63,f:1,cat:'brand',icon:'🍚',unit:'1개(210g)'},
+  {n:'비비고 왕교자',b:'CJ',c:290,p:12,k:38,f:10,cat:'brand',icon:'🥟',unit:'6개(210g)'},
+  {n:'스팸(클래식)',b:'CJ',c:270,p:11,k:2,f:23,cat:'brand',icon:'🥫',unit:'반캔(95g)'},
+  {n:'스팸(라이트)',b:'CJ',c:160,p:12,k:2,f:11,cat:'brand',icon:'🥫',unit:'반캔(95g)'},
+  {n:'고메 함박스테이크',b:'CJ',c:220,p:13,k:12,f:13,cat:'brand',icon:'🥩',unit:'1개(130g)'},
+  // ── 동원 ──
+  {n:'동원 참치캔(라이트)',b:'동원',c:100,p:18,k:0,f:3,cat:'brand',icon:'🐟',unit:'1캔(100g)'},
+  {n:'덴마크 오리지널치즈',b:'동원',c:80,p:5,k:0,f:7,cat:'brand',icon:'🧀',unit:'1장(20g)'},
+  // ── 빙그레 ──
+  {n:'바나나맛우유',b:'빙그레',c:160,p:5,k:26,f:4,cat:'brand',icon:'🍌',unit:'1개(240ml)'},
+  {n:'요플레(플레인)',b:'빙그레',c:90,p:5,k:14,f:2,cat:'brand',icon:'🥛',unit:'1개(85g)'},
+  {n:'메로나',b:'빙그레',c:75,p:1,k:15,f:2,cat:'brand',icon:'🍦',unit:'1개(100ml)'},
+  // ── 서울우유 / 매일유업 ──
+  {n:'서울우유(흰우유)',b:'서울우유',c:130,p:7,k:10,f:7,cat:'brand',icon:'🥛',unit:'1팩(200ml)'},
+  {n:'매일 바이오 요거트',b:'매일유업',c:80,p:5,k:12,f:1,cat:'brand',icon:'🥛',unit:'1개(80g)'},
+  {n:'셀렉스 코어 프로틴',b:'매일유업',c:100,p:20,k:4,f:1,cat:'brand',icon:'💪',unit:'1팩(200ml)'},
+  // ── 한국야쿠르트 ──
+  {n:'야쿠르트(원조)',b:'hy',c:65,p:1,k:14,f:0,cat:'brand',icon:'🍶',unit:'1개(65ml)'},
+  {n:'윌(발효유)',b:'hy',c:80,p:3,k:15,f:1,cat:'brand',icon:'🍶',unit:'1개(150ml)'},
+  // ── 카페 음료 ──
+  {n:'스타벅스 아메리카노(T)',b:'스타벅스',c:10,p:1,k:1,f:0,cat:'brand',icon:'☕',unit:'톨(355ml)'},
+  {n:'스타벅스 카페라떼(T)',b:'스타벅스',c:180,p:10,k:18,f:7,cat:'brand',icon:'☕',unit:'톨(355ml)'},
+  {n:'스타벅스 그린티라떼(T)',b:'스타벅스',c:250,p:9,k:40,f:6,cat:'brand',icon:'🍵',unit:'톨(355ml)'},
+  {n:'이디야 아메리카노',b:'이디야',c:5,p:0,k:1,f:0,cat:'brand',icon:'☕',unit:'1잔(350ml)'},
+  {n:'메가커피 아메리카노',b:'메가커피',c:5,p:0,k:1,f:0,cat:'brand',icon:'☕',unit:'1잔(350ml)'},
+  // ── 음료 ──
+  {n:'코카콜라(캔)',b:'코카콜라',c:150,p:0,k:39,f:0,cat:'brand',icon:'🥤',unit:'1캔(355ml)'},
+  {n:'코카콜라 제로',b:'코카콜라',c:0,p:0,k:0,f:0,cat:'brand',icon:'🥤',unit:'1캔(355ml)'},
+  {n:'포카리스웨트(캔)',b:'오츠카',c:100,p:0,k:25,f:0,cat:'brand',icon:'🥤',unit:'1캔(340ml)'},
+  {n:'게토레이',b:'펩시코',c:80,p:0,k:21,f:0,cat:'brand',icon:'⚡',unit:'1캔(355ml)'},
+  {n:'박카스D',b:'동아제약',c:50,p:0,k:12,f:0,cat:'brand',icon:'⚡',unit:'1병(120ml)'},
+  {n:'컵라면 도시락',b:'팔도',c:380,p:8,k:59,f:12,cat:'brand',icon:'🍜',unit:'1개(86g)'},
+];
+
 // 한국 식품 내장 DB (식약처 식품영양성분DB 기준, 1인분 기준)
 const KR_FOOD_DB = [
   // ── 밥류 ──
@@ -2501,121 +2661,258 @@ const KR_FOOD_DB = [
   {n:'이온음료(포카리)',c:45,p:0,k:11,f:0,cat:'drink',icon:'🥤',unit:'1캔(240ml)'},
 ];
 
-const FOOD_ICONS = {
-  rice:'🍚', soup:'🍲', meat:'🥩', side:'🥗', noodle:'🍜', snack:'🍰', fruit:'🍎', drink:'☕'
-};
+const ALL_LOCAL_DB = [...KR_BRAND_DB, ...KR_FOOD_DB];
 
 let fsCurTab = 'all';
 let fsDebounceTimer = null;
+let fsPendingFood = null;  // 서빙 선택 팝업에 넘길 음식 데이터
+let fsPendingQty = 1;
+let fsPendingMt = 'lunch';
 
 function openFoodSearch() {
-  document.getElementById('food-search-modal').classList.add('open');
+  const modal = document.getElementById('food-search-modal');
+  modal.classList.add('open');
   const inp = document.getElementById('fs-input');
   inp.value = '';
+  document.getElementById('fs-clear').classList.remove('show');
   fsCurTab = 'all';
   document.querySelectorAll('.fs-tab').forEach(b => b.classList.remove('active'));
   document.querySelector('.fs-tab').classList.add('active');
+  fsSetStatus('자주 먹는 음식이나 브랜드를 검색해봐! 🔍', false);
   renderFsResults('');
-  setTimeout(() => inp.focus(), 350);
+  setTimeout(() => inp.focus(), 300);
+}
+
+function clearFsInput() {
+  const inp = document.getElementById('fs-input');
+  inp.value = '';
+  document.getElementById('fs-clear').classList.remove('show');
+  renderFsResults('');
+  inp.focus();
 }
 
 function setFsTab(tab, btn) {
   fsCurTab = tab;
   document.querySelectorAll('.fs-tab').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  renderFsResults(document.getElementById('fs-input').value.trim());
+  const q = document.getElementById('fs-input').value.trim();
+  renderFsResults(q);
 }
 
 function onFoodSearch(q) {
-  clearTimeout(fsDebounceTimer);
   const trimmed = q.trim();
-  // 로컬 DB는 즉시 표시
+  document.getElementById('fs-clear').classList.toggle('show', trimmed.length > 0);
+  clearTimeout(fsDebounceTimer);
   renderFsResults(trimmed);
-  // Open Food Facts API 검색 (2글자 이상, 한글이 아닌 경우도 지원)
   if (trimmed.length >= 2) {
-    fsDebounceTimer = setTimeout(() => searchOpenFoodFacts(trimmed), 700);
+    fsDebounceTimer = setTimeout(() => searchOpenFoodFacts(trimmed), 600);
   }
 }
 
-// 로컬 DB 검색 + 렌더링
+function fsSetStatus(txt, loading) {
+  document.getElementById('fs-status-txt').textContent = txt;
+  document.getElementById('fs-spinner').classList.toggle('show', loading);
+}
+
+// 전체 로컬 DB 검색 + 렌더링 (브랜드 + 일반 음식 통합)
 function renderFsResults(q) {
   const el = document.getElementById('fs-results');
-  let items = KR_FOOD_DB;
-  if (fsCurTab !== 'all') items = items.filter(f => f.cat === fsCurTab);
+  const lq = q.toLowerCase();
+
+  let brandItems = KR_BRAND_DB;
+  let foodItems  = KR_FOOD_DB;
+
+  if (fsCurTab === 'brand') {
+    foodItems = [];
+  } else if (fsCurTab !== 'all') {
+    brandItems = [];
+    foodItems  = KR_FOOD_DB.filter(f => f.cat === fsCurTab);
+  }
+
   if (q) {
-    const lq = q.toLowerCase();
-    items = items.filter(f => f.n.toLowerCase().includes(lq));
+    brandItems = brandItems.filter(f =>
+      f.n.toLowerCase().includes(lq) || (f.b||'').toLowerCase().includes(lq));
+    foodItems  = foodItems.filter(f => f.n.toLowerCase().includes(lq));
   }
-  if (items.length === 0 && !q) {
-    el.innerHTML = `<div class="fs-empty">검색어를 입력하거나 탭을 선택해봐! 🔍</div>`;
-    return;
+
+  let html = '';
+
+  if (brandItems.length > 0) {
+    html += `<div class="fs-section-hd">🏪 브랜드 제품 (${brandItems.length})</div>`;
+    html += brandItems.slice(0,40).map(f => foodItemHtml(f,'brand')).join('');
   }
-  if (items.length === 0) {
-    el.innerHTML = `<div class="fs-empty">검색 결과가 없어 😅<br>다른 키워드로 검색하거나 직접 입력해봐!</div>`;
-    return;
+  if (foodItems.length > 0) {
+    html += `<div class="fs-section-hd">🥘 한식/일반 음식 (${foodItems.length})</div>`;
+    html += foodItems.slice(0,40).map(f => foodItemHtml(f,'local')).join('');
   }
-  el.innerHTML = items.slice(0, 50).map(f => foodItemHtml(f, 'local')).join('');
+
+  if (!html) {
+    if (!q) {
+      el.innerHTML = `<div class="fs-empty">🔍 검색어를 입력하거나<br>위 탭에서 카테고리를 선택해봐!</div>`;
+    } else {
+      el.innerHTML = `<div class="fs-empty">😅 "${q}" 검색 결과 없음<br>인터넷 DB 검색 중이야, 잠깐 기다려봐!</div>`;
+    }
+  } else {
+    el.innerHTML = html;
+  }
 }
 
-// Open Food Facts API 검색 (비동기)
+// Open Food Facts API — 한국 및 글로벌 브랜드 제품 검색
 async function searchOpenFoodFacts(q) {
-  const loading = document.getElementById('fs-loading');
+  fsSetStatus('🌐 온라인 상품 DB 검색 중...', true);
   try {
-    loading.style.display = 'block';
-    // 한국 제품 우선 검색
-    const url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(q)}&search_simple=1&action=process&json=1&page_size=20&lc=ko&countries_tags_en=south-korea`;
-    const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
-    const data = await res.json();
-    const products = (data.products || []).filter(p =>
-      p.product_name_ko || p.product_name
-    ).slice(0, 12);
-    if (products.length > 0) {
-      const offItems = products.map(p => {
-        const name = (p.product_name_ko || p.product_name || '').slice(0, 30);
-        const n100 = p.nutriments || {};
-        // 1인분 기준 (serving_size 있으면 사용, 없으면 100g)
-        const srv = parseFloat(p.serving_size) || 100;
-        const factor = srv / 100;
-        const cal = Math.round((n100['energy-kcal_100g'] || n100['energy-kcal'] || 0) * factor);
-        const prot = Math.round((n100['proteins_100g'] || 0) * factor);
-        const carb = Math.round((n100['carbohydrates_100g'] || 0) * factor);
-        const fat  = Math.round((n100['fat_100g'] || 0) * factor);
-        if (!name || cal <= 0) return null;
-        return { n: name, c: cal, p: prot, k: carb, f: fat, cat: 'off', icon: '🏪', unit: p.serving_size || '1인분' };
-      }).filter(Boolean);
+    // 1차: 한국 제품 검색
+    const url1 = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(q)}&action=process&json=1&page_size=24&fields=product_name,product_name_ko,brands,nutriments,serving_size,categories_tags&countries_tags_en=south-korea`;
+    // 2차: 글로벌 검색 (병렬)
+    const url2 = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(q)}&action=process&json=1&page_size=12&fields=product_name,product_name_ko,brands,nutriments,serving_size&lc=ko`;
 
-      if (offItems.length > 0) {
-        const el = document.getElementById('fs-results');
-        const existing = el.innerHTML;
-        const offHtml = `<div style="padding:8px 14px 4px;font-size:11px;color:#2196f3;font-weight:700">🌐 Open Food Facts 검색 결과</div>` +
-          offItems.map(f => foodItemHtml(f, 'off')).join('');
-        el.innerHTML = existing + offHtml;
-      }
+    const [r1, r2] = await Promise.allSettled([
+      fetch(url1, { signal: AbortSignal.timeout(6000) }).then(r => r.json()),
+      fetch(url2, { signal: AbortSignal.timeout(6000) }).then(r => r.json()),
+    ]);
+
+    const p1 = r1.status === 'fulfilled' ? (r1.value.products || []) : [];
+    const p2 = r2.status === 'fulfilled' ? (r2.value.products || []) : [];
+
+    // 중복 제거 후 합치기
+    const seen = new Set();
+    const allProducts = [...p1, ...p2].filter(p => {
+      const name = p.product_name_ko || p.product_name || '';
+      if (!name || seen.has(name)) return false;
+      seen.add(name);
+      return true;
+    });
+
+    const offItems = allProducts.map(p => {
+      const name  = (p.product_name_ko || p.product_name || '').replace(/\s+/g,' ').trim().slice(0,35);
+      const brand = (p.brands || '').split(',')[0].trim().slice(0,20);
+      const n100  = p.nutriments || {};
+      // 서빙사이즈 파싱 (숫자만 추출)
+      const srvRaw = parseFloat((p.serving_size||'').replace(/[^0-9.]/g,''));
+      const srv = (srvRaw > 0 && srvRaw < 2000) ? srvRaw : 100;
+      const factor = srv / 100;
+      const kcal100 = n100['energy-kcal_100g'] || n100['energy-kcal'] || n100['energy_100g']/4.184 || 0;
+      const cal  = Math.round(kcal100 * factor);
+      const prot = Math.round((n100['proteins_100g']       || 0) * factor);
+      const carb = Math.round((n100['carbohydrates_100g']  || 0) * factor);
+      const fat  = Math.round((n100['fat_100g']            || 0) * factor);
+      if (!name || cal <= 0) return null;
+      return { n:name, b:brand||'', c:cal, p:prot, k:carb, f:fat, cat:'off', icon:'🏪', unit: p.serving_size || `${srv}g` };
+    }).filter(Boolean);
+
+    if (offItems.length > 0) {
+      const el = document.getElementById('fs-results');
+      const offHtml = `<div class="fs-section-hd">🌐 온라인 상품 DB (${offItems.length}건)</div>` +
+        offItems.map(f => foodItemHtml(f,'off')).join('');
+      // 기존 결과 뒤에 추가
+      el.innerHTML = el.innerHTML + offHtml;
+      fsSetStatus(`✅ 총 ${offItems.length}개 상품 검색됨`, false);
+    } else {
+      fsSetStatus('인터넷 DB에서 결과를 찾지 못했어 😅', false);
     }
-  } catch(e) { /* 네트워크 오류 무시 */ }
-  finally { loading.style.display = 'none'; }
+  } catch(e) {
+    fsSetStatus('네트워크 오류. 로컬 DB 결과만 표시돼', false);
+  }
 }
 
 function foodItemHtml(f, source) {
-  const badge = source === 'off' ? `<span class="fs-source-badge">외부DB</span>` : '';
-  return `<div class="fs-item" onclick='addFoodFromSearch(${JSON.stringify(f)})'>
-    <div class="fs-item-icon">${f.icon}</div>
-    <div class="fs-item-info">
-      <div class="fs-item-name">${esc2(f.n)}${badge}</div>
-      <div class="fs-item-meta">단백질 ${f.p}g · 탄수화물 ${f.k}g · 지방 ${f.f}g &nbsp;|&nbsp; ${f.unit||''}</div>
+  const brandBadge = f.b ? `<span class="fs-brand-badge">${esc2(f.b)}</span>` : '';
+  const offBadge   = source === 'off' ? `<span class="fs-off-badge">온라인DB</span>` : '';
+  const fd = JSON.stringify(f).replace(/'/g,"&#39;");
+  return `<div class="fs-item">
+    <div class="fs-item-icon">${f.icon||'🍽️'}</div>
+    <div class="fs-item-body">
+      <div class="fs-item-row1">
+        <span class="fs-item-name">${esc2(f.n)}</span>${brandBadge}${offBadge}
+      </div>
+      <div class="fs-item-row2">
+        <span class="fs-macro"><span class="fs-macro-dot p"></span>단백질 ${f.p}g</span>
+        <span class="fs-macro"><span class="fs-macro-dot k"></span>탄수 ${f.k}g</span>
+        <span class="fs-macro"><span class="fs-macro-dot f"></span>지방 ${f.f}g</span>
+        <span class="fs-item-unit">${f.unit||''}</span>
+      </div>
     </div>
-    <div class="fs-item-cal">${f.c}<small style="font-size:10px;font-weight:500">kcal</small></div>
+    <div class="fs-item-right">
+      <div class="fs-item-cal">${f.c}</div>
+      <div class="fs-item-kcal">kcal</div>
+    </div>
+    <button class="fs-item-add" onclick='openServingPopup(${fd})'>+</button>
   </div>`;
 }
 
-function addFoodFromSearch(food) {
-  document.getElementById('food-search-modal').classList.remove('open');
+// ── 서빙 선택 팝업 ──
+function openServingPopup(food) {
+  fsPendingFood = food;
+  fsPendingQty  = 1;
+  // 기본 식사 타입 (시간 기준)
   const h = new Date().getHours();
-  const mt = h < 10 ? 'breakfast' : h < 14 ? 'lunch' : h < 20 ? 'dinner' : 'snack';
-  addMealEntry(food.n, food.c, food.p, food.k, food.f, mt);
+  fsPendingMt = h < 10 ? 'breakfast' : h < 14 ? 'lunch' : h < 20 ? 'dinner' : 'snack';
+
+  document.getElementById('fsp-name').textContent = food.n;
+  document.getElementById('fsp-unit').textContent = `기준: ${food.unit||'1인분'}`;
+
+  // 식사 타입 버튼 상태
+  document.querySelectorAll('.fs-mt-btn').forEach(b => {
+    b.classList.toggle('sel', b.dataset.mt === fsPendingMt);
+  });
+  // 서빙 옵션 — 1인분 기본
+  document.querySelectorAll('.fs-serving-opt').forEach(b => b.classList.remove('sel'));
+  document.querySelectorAll('.fs-serving-opt')[1]?.classList.add('sel'); // "1인분"
+
+  updateServingPreview();
+  document.getElementById('fs-serving-popup').classList.add('open');
+}
+
+function updateServingPreview() {
+  const f = fsPendingFood; if (!f) return;
+  const q = fsPendingQty;
+  document.getElementById('fsp-qty').textContent = q % 1 === 0 ? q : q.toFixed(1);
+  document.getElementById('fsp-cal').textContent = Math.round(f.c * q).toLocaleString();
+  document.getElementById('fsp-p').textContent   = Math.round(f.p * q) + 'g';
+  document.getElementById('fsp-k').textContent   = Math.round(f.k * q) + 'g';
+  document.getElementById('fsp-f').textContent   = Math.round(f.f * q) + 'g';
+}
+
+function changeQty(delta) {
+  fsPendingQty = Math.max(0.5, Math.round((fsPendingQty + delta) * 10) / 10);
+  // 옵션 버튼 선택 해제
+  document.querySelectorAll('.fs-serving-opt').forEach(b => b.classList.remove('sel'));
+  updateServingPreview();
+}
+
+function setServingMult(mult, btn) {
+  fsPendingQty = mult;
+  document.querySelectorAll('.fs-serving-opt').forEach(b => b.classList.remove('sel'));
+  btn.classList.add('sel');
+  updateServingPreview();
+}
+
+function selFsMt(btn) {
+  fsPendingMt = btn.dataset.mt;
+  document.querySelectorAll('.fs-mt-btn').forEach(b => b.classList.remove('sel'));
+  btn.classList.add('sel');
+}
+
+function confirmServingAdd() {
+  const f = fsPendingFood; if (!f) return;
+  const q   = fsPendingQty;
+  const cal  = Math.round(f.c * q);
+  const prot = Math.round(f.p * q);
+  const carb = Math.round(f.k * q);
+  const fat  = Math.round(f.f * q);
+  const label = q === 1 ? f.n : `${f.n} (×${q % 1 === 0 ? q : q.toFixed(1)})`;
+
+  addMealEntry(label, cal, prot, carb, fat, fsPendingMt);
   renderCalories();
-  showToast(`🍽️ ${food.n} ${food.c}kcal 기록됐어!`);
+  showToast(`🍽️ ${label} ${cal}kcal 기록됐어!`);
   updateCalBadge();
+
+  document.getElementById('fs-serving-popup').classList.remove('open');
+  document.getElementById('food-search-modal').classList.remove('open');
+}
+
+function addFoodFromSearch(food) { // 구버전 호환
+  openServingPopup(food);
 }
 
 /* ══════════════════════════════════════════════════
